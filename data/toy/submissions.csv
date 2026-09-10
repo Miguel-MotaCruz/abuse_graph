@@ -1,0 +1,37 @@
+submission_id,subreddit,submission_title,submission_body,submission_score,author_username,submission_url,submission_timestamp,submission_kind,game_id,related_team_ids
+s_000000,CollegeBasketballSynthetic,"[Post Game Thread] Orchard Hill College defeats Vinewood A&M, 78-62","Box Score
+
+Team | 1H | 2H | Final",26,benchmob_analyst7984,https://example.invalid/synthetic,2025-11-05 21:30:00 UTC,post_game_thread,men|2025-2026|G00000|men_ORCH_orchard-hill-college-mariners|men_VINE_vinewood-a-m-timberwolves,men_ORCH_orchard-hill-college-mariners|men_VINE_vinewood-a-m-timberwolves
+s_000001,CollegeBasketballSynthetic,"[Post Game Thread] Ivyport University defeats Kirkmont State, 80-75","Box Score
+
+Team | 1H | 2H | Final",14,pumpfake_diehard867,https://example.invalid/synthetic,2025-11-19 00:30:00 UTC,post_game_thread,men|2025-2026|G00003|men_IVYP_ivyport-university-sabers|men_KIRK_kirkmont-state-ravens,men_IVYP_ivyport-university-sabers|men_KIRK_kirkmont-state-ravens
+s_000002,CollegeBasketballSynthetic,"[Post Game Thread] Vinewood A&M defeats Kingsmoor Poly, 82-74","Box Score
+
+Team | 1H | 2H | Final",21,glasscleaner_fan8736,https://example.invalid/synthetic,2025-12-10 00:00:00 UTC,post_game_thread,men|2025-2026|G00009|men_VINE_vinewood-a-m-timberwolves|men_KING_kingsmoor-poly-ironmen,men_VINE_vinewood-a-m-timberwolves|men_KING_kingsmoor-poly-ironmen
+s_000003,CollegeBasketballSynthetic,"[Post Game Thread] Vellmont Tech defeats Kirkmont State, 79-54","Box Score
+
+Team | 1H | 2H | Final",29,rimrun_nerd9811,https://example.invalid/synthetic,2025-12-28 19:00:00 UTC,post_game_thread,men|2025-2026|G00002|men_KIRK_kirkmont-state-ravens|men_VELL_vellmont-tech-cyclones,men_KIRK_kirkmont-state-ravens|men_VELL_vellmont-tech-cyclones
+s_000004,CollegeBasketballSynthetic,"[Post Game Thread] Vinewood A&M defeats Kingsmoor Poly, 77-64","Box Score
+
+Team | 1H | 2H | Final",30,glasscleaner_fan8736,https://example.invalid/synthetic,2026-01-07 20:30:00 UTC,post_game_thread,men|2025-2026|G00006|men_VINE_vinewood-a-m-timberwolves|men_KING_kingsmoor-poly-ironmen,men_VINE_vinewood-a-m-timberwolves|men_KING_kingsmoor-poly-ironmen
+s_000005,CollegeBasketballSynthetic,"[Post Game Thread] Ivyport University defeats Kirkmont State, 69-65","Box Score
+
+Team | 1H | 2H | Final",57,hardwood_sicko4042,https://example.invalid/synthetic,2026-01-17 23:30:00 UTC,post_game_thread,men|2025-2026|G00001|men_IVYP_ivyport-university-sabers|men_KIRK_kirkmont-state-ravens,men_IVYP_ivyport-university-sabers|men_KIRK_kirkmont-state-ravens
+s_000006,CollegeBasketballSynthetic,"[Post Game Thread] Ivyport University defeats Kirkmont State, 67-64","Box Score
+
+Team | 1H | 2H | Final",14,benchmob_analyst7984,https://example.invalid/synthetic,2026-02-06 21:30:00 UTC,post_game_thread,men|2025-2026|G00008|men_KIRK_kirkmont-state-ravens|men_IVYP_ivyport-university-sabers,men_KIRK_kirkmont-state-ravens|men_IVYP_ivyport-university-sabers
+s_000007,CollegeBasketballSynthetic,"[Post Game Thread] Vinewood A&M defeats Kingsmoor Poly, 79-75","Box Score
+
+Team | 1H | 2H | Final",32,hardwood_sicko4042,https://example.invalid/synthetic,2026-02-11 20:30:00 UTC,post_game_thread,men|2025-2026|G00007|men_KING_kingsmoor-poly-ironmen|men_VINE_vinewood-a-m-timberwolves,men_KING_kingsmoor-poly-ironmen|men_VINE_vinewood-a-m-timberwolves
+s_000008,CollegeBasketballSynthetic,"[Post Game Thread] Kirkmont State defeats Vinewood A&M, 78-75","Box Score
+
+Team | 1H | 2H | Final",4,backdoorcut_nerd5635,https://example.invalid/synthetic,2026-02-24 21:30:00 UTC,post_game_thread,men|2025-2026|G00005|men_KIRK_kirkmont-state-ravens|men_VINE_vinewood-a-m-timberwolves,men_KIRK_kirkmont-state-ravens|men_VINE_vinewood-a-m-timberwolves
+s_000009,CollegeBasketballSynthetic,"[Post Game Thread] Vellmont Tech defeats Kingsmoor Poly, 75-62","Box Score
+
+Team | 1H | 2H | Final",463,backdoorcut_nerd5635,https://example.invalid/synthetic,2026-03-05 23:00:00 UTC,post_game_thread,men|2025-2026|G00004|men_VELL_vellmont-tech-cyclones|men_KING_kingsmoor-poly-ironmen,men_VELL_vellmont-tech-cyclones|men_KING_kingsmoor-poly-ironmen
+s_000010,CollegeBasketballSynthetic,Who is the most disappointing player in the Coastal Eight this year?,,10,benchmob_analyst7984,https://example.invalid/synthetic,2025-11-25 00:06:11 UTC,discussion,,men_KING_kingsmoor-poly-ironmen|men_VINE_vinewood-a-m-timberwolves
+s_000011,CollegeBasketballSynthetic,Who is the most disappointing player in the Coastal Eight this year?,,64,swish_sicko3079,https://example.invalid/synthetic,2026-02-25 13:53:31 UTC,discussion,,men_VINE_vinewood-a-m-timberwolves|men_KING_kingsmoor-poly-ironmen
+s_000012,CollegeBasketballSynthetic,Unpopular opinion thread: Coastal Eight edition,,69,pumpfake_diehard867,https://example.invalid/synthetic,2025-11-16 20:21:46 UTC,discussion,,men_KING_kingsmoor-poly-ironmen|men_VINE_vinewood-a-m-timberwolves
+s_000013,CollegeBasketballSynthetic,Unpopular opinion thread: Coastal Eight edition,,135,pumpfake_diehard867,https://example.invalid/synthetic,2025-12-25 23:07:03 UTC,discussion,,men_KING_kingsmoor-poly-ironmen|men_VINE_vinewood-a-m-timberwolves
+s_000014,CollegeBasketballSynthetic,Who is the most disappointing player in the Great Plains this year?,,25,hardwood_sicko4042,https://example.invalid/synthetic,2025-12-12 08:59:25 UTC,discussion,,men_ORCH_orchard-hill-college-mariners|men_VELL_vellmont-tech-cyclones
+s_000015,CollegeBasketballSynthetic,Weekly Coastal Eight discussion thread,,58,swish_sicko3079,https://example.invalid/synthetic,2026-02-12 18:47:55 UTC,discussion,,men_VINE_vinewood-a-m-timberwolves|men_KING_kingsmoor-poly-ironmen

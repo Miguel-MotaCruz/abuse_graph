@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.venv/
+.DS_Store
+my_graph.png
+*.png
+!reference/*.png
+
+# Only the toy and small datasets ship for now. The rest stay local until the
+# supervisor hands them over.
+data/medium/
+data/large/
+data/annotated_sample/
+interactive/medium.html
+interactive/large.html
+interactive/annotated_sample.html

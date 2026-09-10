@@ -1,0 +1,25 @@
+player_id,player_slug,season,gender,team_id,player_name,jersey_number,position,is_national,is_common_word_name
+2025-2026:men:men_KIRK_kirkmont-state-ravens:ivan-nystrom,ivan-nystrom,2025-2026,men,men_KIRK_kirkmont-state-ravens,Ivan Nystrom,19,SF,False,False
+2025-2026:men:men_KIRK_kirkmont-state-ravens:kwame-fontaine,kwame-fontaine,2025-2026,men,men_KIRK_kirkmont-state-ravens,Kwame Fontaine,43,G,False,False
+2025-2026:men:men_KIRK_kirkmont-state-ravens:preston-rutherford,preston-rutherford,2025-2026,men,men_KIRK_kirkmont-state-ravens,Preston Rutherford,11,PF,False,True
+2025-2026:men:men_KIRK_kirkmont-state-ravens:bennett-whitlock,bennett-whitlock,2025-2026,men,men_KIRK_kirkmont-state-ravens,Bennett Whitlock,10,PF,False,True
+2025-2026:men:men_VELL_vellmont-tech-cyclones:omar-ellsworth,omar-ellsworth,2025-2026,men,men_VELL_vellmont-tech-cyclones,Omar Ellsworth,27,C,False,False
+2025-2026:men:men_VELL_vellmont-tech-cyclones:dominic-eastwick,dominic-eastwick,2025-2026,men,men_VELL_vellmont-tech-cyclones,Dominic Eastwick,1,C,False,False
+2025-2026:men:men_VELL_vellmont-tech-cyclones:preston-hargrove,preston-hargrove,2025-2026,men,men_VELL_vellmont-tech-cyclones,Preston Hargrove,12,G,False,True
+2025-2026:men:men_VELL_vellmont-tech-cyclones:yancy-hargrove,yancy-hargrove,2025-2026,men,men_VELL_vellmont-tech-cyclones,Yancy Hargrove,39,SF,False,False
+2025-2026:men:men_VINE_vinewood-a-m-timberwolves:xavier-jimenez,xavier-jimenez,2025-2026,men,men_VINE_vinewood-a-m-timberwolves,Xavier Jimenez,46,G,False,False
+2025-2026:men:men_VINE_vinewood-a-m-timberwolves:corey-kowalczyk,corey-kowalczyk,2025-2026,men,men_VINE_vinewood-a-m-timberwolves,Corey Kowalczyk,4,SF,False,False
+2025-2026:men:men_VINE_vinewood-a-m-timberwolves:rashad-petrov,rashad-petrov,2025-2026,men,men_VINE_vinewood-a-m-timberwolves,Rashad Petrov,48,SF,False,False
+2025-2026:men:men_VINE_vinewood-a-m-timberwolves:terrance-wickham,terrance-wickham,2025-2026,men,men_VINE_vinewood-a-m-timberwolves,Terrance Wickham,43,C,False,False
+2025-2026:men:men_IVYP_ivyport-university-sabers:corey-fontaine,corey-fontaine,2025-2026,men,men_IVYP_ivyport-university-sabers,Corey Fontaine,47,SF,False,False
+2025-2026:men:men_IVYP_ivyport-university-sabers:franklin-kowalczyk,franklin-kowalczyk,2025-2026,men,men_IVYP_ivyport-university-sabers,Franklin Kowalczyk,38,SF,False,False
+2025-2026:men:men_IVYP_ivyport-university-sabers:darius-quiroga,darius-quiroga,2025-2026,men,men_IVYP_ivyport-university-sabers,Darius Quiroga,37,SF,False,False
+2025-2026:men:men_IVYP_ivyport-university-sabers:gideon-ustinov,gideon-ustinov,2025-2026,men,men_IVYP_ivyport-university-sabers,Gideon Ustinov,28,SF,False,False
+2025-2026:men:men_ORCH_orchard-hill-college-mariners:hector-jimenez,hector-jimenez,2025-2026,men,men_ORCH_orchard-hill-college-mariners,Hector Jimenez,35,PF,False,False
+2025-2026:men:men_ORCH_orchard-hill-college-mariners:roland-duvalier,roland-duvalier,2025-2026,men,men_ORCH_orchard-hill-college-mariners,Roland Duvalier,50,PF,False,False
+2025-2026:men:men_ORCH_orchard-hill-college-mariners:emeka-wexler,emeka-wexler,2025-2026,men,men_ORCH_orchard-hill-college-mariners,Emeka Wexler,5,SF,False,False
+2025-2026:men:men_ORCH_orchard-hill-college-mariners:victor-eastwick,victor-eastwick,2025-2026,men,men_ORCH_orchard-hill-college-mariners,Victor Eastwick,17,G,False,True
+2025-2026:men:men_KING_kingsmoor-poly-ironmen:jalen-wexler,jalen-wexler,2025-2026,men,men_KING_kingsmoor-poly-ironmen,Jalen Wexler,3,SF,False,False
+2025-2026:men:men_KING_kingsmoor-poly-ironmen:xavier-duvalier,xavier-duvalier,2025-2026,men,men_KING_kingsmoor-poly-ironmen,Xavier Duvalier,51,SF,True,False
+2025-2026:men:men_KING_kingsmoor-poly-ironmen:lorenzo-vandergriff,lorenzo-vandergriff,2025-2026,men,men_KING_kingsmoor-poly-ironmen,Lorenzo Vandergriff,24,G,False,False
+2025-2026:men:men_KING_kingsmoor-poly-ironmen:jalen-petrov,jalen-petrov,2025-2026,men,men_KING_kingsmoor-poly-ironmen,Jalen Petrov,37,G,False,False

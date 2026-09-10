@@ -1,0 +1,41 @@
+{
+  "schema_version": "synth-1.0",
+  "dataset": "small",
+  "seed": 43,
+  "note": "First dataset where degree distributions and communities are worth plotting.",
+  "counts": {
+    "teams": 8,
+    "players": 48,
+    "coaches": 8,
+    "games": 28,
+    "users": 60,
+    "submissions": 43,
+    "comments": 600,
+    "target_entities": 840,
+    "resolved_targets": 830,
+    "distinct_resolved_targets": 53
+  },
+  "rates": {
+    "entity_is_abusive_YES": 0.1679,
+    "entity_unresolved_target": 0.0119,
+    "comment_has_abusive_entity": 0.2283,
+    "weak_qwen": 0.0733,
+    "weak_llama": 0.1367,
+    "weak_either": 0.1517,
+    "weak_both": 0.0583,
+    "reply_to_submission": 0.6367,
+    "comments_with_multiple_targets": 0.2817,
+    "multi_target_comments_with_mixed_abuse": 0.07,
+    "unresolvable_target": 0.0119
+  },
+  "activity_tail": {
+    "comments_per_user_median": 4.0,
+    "comments_per_user_max": 59,
+    "share_by_top_1pct_users": 0.0983
+  },
+  "entity_type_mix": {
+    "player NCAA": 0.8476,
+    "team": 0.1524
+  },
+  "calibration_intercept": -2.8475
+}

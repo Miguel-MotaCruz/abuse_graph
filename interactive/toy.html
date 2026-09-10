@@ -1,0 +1,364 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>graph</title>
+<style>
+ :root{--bg:#fff;--fg:#1c1f24;--panel:#f6f7f9;--line:#dde1e6}
+ *{box-sizing:border-box}
+ body{margin:0;font:13px/1.45 system-ui,-apple-system,Segoe UI,sans-serif;
+      color:var(--fg);background:var(--bg);display:flex;height:100vh;overflow:hidden}
+ #side{width:250px;flex:0 0 250px;background:var(--panel);border-right:1px solid var(--line);
+       padding:14px;overflow-y:auto}
+ #side h1{font-size:14px;margin:0 0 4px}
+ #side .note{font-size:11px;color:#666;margin:0 0 12px}
+ fieldset{border:1px solid var(--line);border-radius:6px;margin:0 0 12px;padding:8px 10px}
+ legend{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#666;padding:0 4px}
+ label{display:flex;align-items:center;gap:6px;margin:3px 0;cursor:pointer}
+ input[type=range]{width:100%}
+ .sw{width:11px;height:11px;border-radius:2px;display:inline-block;border:1px solid #444}
+ #dataset{flex:1;position:relative}
+ svg{width:100%;height:100%;display:block;cursor:grab;background:#fff}
+ svg.drag{cursor:grabbing}
+ #tip{position:absolute;pointer-events:none;background:#1c1f24;color:#fff;padding:6px 8px;
+      border-radius:4px;font-size:12px;opacity:0;transition:opacity .1s;max-width:280px}
+ #hud{position:absolute;left:10px;bottom:10px;font-size:11px;color:#777;
+      background:rgba(255,255,255,.9);padding:4px 8px;border-radius:4px}
+ button{font:inherit;padding:4px 8px;border:1px solid var(--line);background:#fff;
+        border-radius:4px;cursor:pointer;width:100%}
+ .exp{font-size:11.5px;color:#4a5058;margin:4px 0}
+ .exp.mono{font-family:ui-monospace,Menlo,monospace;background:#fff;padding:3px 5px;
+           border-radius:3px;border:1px solid var(--line);text-align:center}
+ .q{font-size:11.5px;color:#7a3e00;background:#fff6e8;border:1px solid #f0d9b5;
+    border-radius:4px;padding:6px 7px;margin:8px 0 0}
+ .tourbtn{text-align:left;margin:3px 0;font-size:12px}
+ .tourbtn.on{background:#2f6fdb;color:#fff;border-color:#2f6fdb;font-weight:600}
+ #tourbox{border-color:#2f6fdb;background:#fff}
+ #tourbox legend{color:#2f6fdb;font-weight:700}
+ input[type=search]{width:100%;padding:4px 6px;border:1px solid var(--line);border-radius:4px;font:inherit}
+</style>
+<div id="side">
+ <h1 id="title"></h1>
+ <p class="note" id="note"></p>
+
+ <fieldset id="tourbox"><legend>&#9654; guided tour &mdash; start here</legend>
+  <div id="tour"></div>
+  <div style="display:flex;gap:6px;margin-top:6px">
+   <button id="prev" style="flex:1">&lsaquo; prev</button>
+   <button id="next" style="flex:1">next &rsaquo;</button>
+  </div>
+  <p class="q" id="question"></p>
+ </fieldset>
+
+ <fieldset><legend>what am I looking at</legend>
+  <p class="exp">Three kinds of node, two kinds of edge:</p>
+  <p class="exp mono">user &rarr; comment &rarr; target</p>
+  <p class="exp">A user <b>authored</b> a comment; that comment <b>targets</b> one
+  or more people. <b>The abuse label lives on the comment&rarr;target edge</b>, so a
+  comment naming three people has three edges and they can carry different
+  labels. Red edge = <b>is_abusive = YES</b>.</p>
+  <p class="exp">There is deliberately <b>no player&rarr;team edge</b>. Team membership
+  is an attribute, not a link &mdash; adding it would invent paths between users
+  and then let you &ldquo;discover&rdquo; the communities it created.</p>
+ </fieldset>
+
+ <fieldset><legend>node types</legend><div id="kinds"></div></fieldset>
+
+ <fieldset><legend>edges</legend>
+  <label><input type="checkbox" id="abuseOnly"> only <b>is_abusive = YES</b></label>
+  <label><input type="checkbox" id="hideAuthored"> hide <i>authored</i> edges</label>
+  <label>opacity <input type="range" id="eop" min="0" max="100" value="35"></label>
+ </fieldset>
+
+ <fieldset><legend>highlight</legend>
+  <label><input type="checkbox" id="markContested"> contested targets
+    <span style="margin-left:auto;color:#888" id="nct"></span></label>
+  <label><input type="checkbox" id="markWolves"> lone wolves
+    <span style="margin-left:auto;color:#888" id="nlw"></span></label>
+ </fieldset>
+
+ <fieldset><legend>communities</legend>
+  <label><input type="checkbox" id="allComm" checked> all</label>
+  <div id="comms" style="max-height:150px;overflow-y:auto"></div>
+ </fieldset>
+
+ <fieldset><legend>find</legend>
+  <input type="search" id="q" placeholder="username or player&hellip;">
+  <label style="margin-top:6px"><input type="checkbox" id="focus"> dim everything else</label>
+ </fieldset>
+
+ <fieldset><legend>size</legend>
+  <label>nodes <input type="range" id="nsz" min="20" max="300" value="100"></label>
+  <button id="reset">reset view</button>
+ </fieldset>
+
+ <fieldset><legend>selection</legend>
+  <div id="stats" class="exp"></div>
+ </fieldset>
+</div>
+<div id="dataset"><svg id="svg"></svg><div id="tip"></div><div id="hud"></div></div>
+<script>
+const D = {"nodes":[{"i":0,"k":"user","l":"hoops_guy1626","x":264.7,"y":334.8,"c":0,"n":62,"a":5,"ct":0,"lw":0},{"i":1,"k":"comment","l":"c_0000000","x":169.0,"y":357.1,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":2,"k":"player","l":"Terrance Wickham","x":181.2,"y":295.6,"c":0,"n":8,"a":0,"ct":1,"lw":0},{"i":3,"k":"player","l":"Xavier Jimenez","x":186.1,"y":327.9,"c":0,"n":9,"a":0,"ct":0,"lw":0},{"i":4,"k":"user","l":"rimrun_nerd9811","x":792.9,"y":865.0,"c":2,"n":13,"a":13,"ct":0,"lw":1},{"i":5,"k":"comment","l":"c_0000001","x":896.4,"y":766.0,"c":2,"n":0,"a":0,"ct":0,"lw":0},{"i":6,"k":"player","l":"Ivan Nystrom","x":1000.0,"y":865.0,"c":2,"n":13,"a":13,"ct":0,"lw":0},{"i":7,"k":"user","l":"fastbreak_diehard4123","x":795.4,"y":632.7,"c":3,"n":12,"a":11,"ct":0,"lw":1},{"i":8,"k":"comment","l":"c_0000002","x":896.4,"y":536.2,"c":3,"n":0,"a":0,"ct":0,"lw":0},{"i":9,"k":"player","l":"Gideon Ustinov","x":997.4,"y":632.7,"c":3,"n":12,"a":11,"ct":0,"lw":0},{"i":10,"k":"user","l":"crossover_truther2559","x":369.8,"y":225.7,"c":0,"n":21,"a":9,"ct":0,"lw":0},{"i":11,"k":"comment","l":"c_0000003","x":353.7,"y":359.9,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":12,"k":"player","l":"Xavier Duvalier","x":333.1,"y":269.5,"c":0,"n":83,"a":15,"ct":1,"lw":0},{"i":13,"k":"player","l":"Emeka Wexler","x":318.3,"y":449.6,"c":0,"n":2,"a":0,"ct":0,"lw":0},{"i":14,"k":"player","l":"Hector Jimenez","x":358.6,"y":443.2,"c":0,"n":2,"a":0,"ct":0,"lw":0},{"i":15,"k":"comment","l":"c_0000004","x":896.4,"y":553.7,"c":3,"n":0,"a":0,"ct":0,"lw":0},{"i":16,"k":"comment","l":"c_0000005","x":896.4,"y":571.3,"c":3,"n":0,"a":0,"ct":0,"lw":0},{"i":17,"k":"comment","l":"c_0000006","x":896.4,"y":588.8,"c":3,"n":0,"a":0,"ct":0,"lw":0},{"i":18,"k":"comment","l":"c_0000007","x":896.4,"y":782.5,"c":2,"n":0,"a":0,"ct":0,"lw":0},{"i":19,"k":"user","l":"rimrun_enjoyer1487","x":430.3,"y":529.3,"c":1,"n":4,"a":0,"ct":0,"lw":0},{"i":20,"k":"comment","l":"c_0000008","x":410.2,"y":485.9,"c":1,"n":0,"a":0,"ct":0,"lw":0},{"i":21,"k":"player","l":"Franklin Kowalczyk","x":484.2,"y":673.5,"c":1,"n":3,"a":0,"ct":0,"lw":0},{"i":22,"k":"comment","l":"c_0000009","x":309.2,"y":370.0,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":23,"k":"comment","l":"c_0000010","x":896.4,"y":606.4,"c":3,"n":0,"a":0,"ct":0,"lw":0},{"i":24,"k":"comment","l":"c_0000011","x":896.4,"y":799.0,"c":2,"n":0,"a":0,"ct":0,"lw":0},{"i":25,"k":"user","l":"glasscleaner_watcher252","x":494.7,"y":614.2,"c":1,"n":9,"a":2,"ct":0,"lw":0},{"i":26,"k":"comment","l":"c_0000012","x":534.0,"y":689.0,"c":1,"n":0,"a":0,"ct":0,"lw":0},{"i":27,"k":"player","l":"Bennett Whitlock","x":482.3,"y":590.4,"c":1,"n":6,"a":0,"ct":0,"lw":0},{"i":28,"k":"player","l":"Darius Quiroga","x":580.5,"y":794.6,"c":1,"n":5,"a":0,"ct":0,"lw":0},{"i":29,"k":"comment","l":"c_0000013","x":896.4,"y":623.9,"c":3,"n":0,"a":0,"ct":0,"lw":0},{"i":30,"k":"user","l":"benchmob_analyst7984","x":452.6,"y":284.0,"c":0,"n":45,"a":3,"ct":0,"lw":0},{"i":31,"k":"comment","l":"c_0000014","x":442.7,"y":318.8,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":32,"k":"comment","l":"c_0000015","x":896.4,"y":641.5,"c":3,"n":0,"a":0,"ct":0,"lw":0},{"i":33,"k":"comment","l":"c_0000016","x":896.4,"y":815.5,"c":2,"n":0,"a":0,"ct":0,"lw":0},{"i":34,"k":"user","l":"fastbreak_guy8149","x":305.3,"y":125.2,"c":0,"n":15,"a":4,"ct":0,"lw":0},{"i":35,"k":"comment","l":"c_0000017","x":321.8,"y":153.2,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":36,"k":"comment","l":"c_0000018","x":225.1,"y":311.3,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":37,"k":"comment","l":"c_0000019","x":896.4,"y":659.0,"c":3,"n":0,"a":0,"ct":0,"lw":0},{"i":38,"k":"comment","l":"c_0000020","x":896.4,"y":832.0,"c":2,"n":0,"a":0,"ct":0,"lw":0},{"i":39,"k":"user","l":"boxout_sicko5932","x":504.5,"y":860.3,"c":1,"n":3,"a":0,"ct":0,"lw":0},{"i":40,"k":"comment","l":"c_0000021","x":516.6,"y":783.2,"c":1,"n":0,"a":0,"ct":0,"lw":0},{"i":41,"k":"player","l":"Preston Rutherford","x":531.0,"y":819.6,"c":1,"n":4,"a":1,"ct":0,"lw":0},{"i":42,"k":"user","l":"pumpfake_diehard867","x":618.2,"y":890.8,"c":1,"n":10,"a":0,"ct":0,"lw":0},{"i":43,"k":"comment","l":"c_0000022","x":633.7,"y":851.7,"c":1,"n":0,"a":0,"ct":0,"lw":0},{"i":44,"k":"comment","l":"c_0000023","x":559.8,"y":804.7,"c":1,"n":0,"a":0,"ct":0,"lw":0},{"i":45,"k":"player","l":"Kwame Fontaine","x":597.1,"y":902.0,"c":1,"n":5,"a":0,"ct":0,"lw":0},{"i":46,"k":"player","l":"Corey Fontaine","x":565.6,"y":744.5,"c":1,"n":2,"a":0,"ct":0,"lw":0},{"i":47,"k":"comment","l":"c_0000024","x":896.4,"y":676.6,"c":3,"n":0,"a":0,"ct":0,"lw":0},{"i":48,"k":"user","l":"backdoorcut_nerd5635","x":561.9,"y":1000.0,"c":1,"n":2,"a":0,"ct":0,"lw":0},{"i":49,"k":"comment","l":"c_0000025","x":554.7,"y":921.9,"c":1,"n":0,"a":0,"ct":0,"lw":0},{"i":50,"k":"comment","l":"c_0000026","x":530.0,"y":665.5,"c":1,"n":0,"a":0,"ct":0,"lw":0},{"i":51,"k":"comment","l":"c_0000027","x":896.4,"y":694.2,"c":3,"n":0,"a":0,"ct":0,"lw":0},{"i":52,"k":"comment","l":"c_0000028","x":896.4,"y":711.7,"c":3,"n":0,"a":0,"ct":0,"lw":0},{"i":53,"k":"comment","l":"c_0000029","x":896.4,"y":848.5,"c":2,"n":0,"a":0,"ct":0,"lw":0},{"i":54,"k":"comment","l":"c_0000030","x":430.3,"y":471.6,"c":1,"n":0,"a":0,"ct":0,"lw":0},{"i":55,"k":"comment","l":"c_0000031","x":896.4,"y":865.0,"c":2,"n":0,"a":0,"ct":0,"lw":0},{"i":56,"k":"comment","l":"c_0000032","x":896.4,"y":881.5,"c":2,"n":0,"a":0,"ct":0,"lw":0},{"i":57,"k":"comment","l":"c_0000033","x":608.6,"y":865.6,"c":1,"n":0,"a":0,"ct":0,"lw":0},{"i":58,"k":"user","l":"hardwood_sicko4042","x":233.5,"y":104.4,"c":4,"n":6,"a":0,"ct":0,"lw":0},{"i":59,"k":"comment","l":"c_0000034","x":270.1,"y":153.4,"c":4,"n":0,"a":0,"ct":0,"lw":0},{"i":60,"k":"comment","l":"c_0000035","x":342.3,"y":106.0,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":61,"k":"player","l":"Rashad Petrov","x":351.2,"y":0.0,"c":0,"n":1,"a":0,"ct":0,"lw":0},{"i":62,"k":"comment","l":"c_0000036","x":896.4,"y":898.0,"c":2,"n":0,"a":0,"ct":0,"lw":0},{"i":63,"k":"comment","l":"c_0000037","x":896.4,"y":914.5,"c":2,"n":0,"a":0,"ct":0,"lw":0},{"i":64,"k":"user","l":"pumpfake_enjoyer5171","x":0.0,"y":338.1,"c":0,"n":2,"a":0,"ct":0,"lw":0},{"i":65,"k":"comment","l":"c_0000038","x":89.7,"y":325.5,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":66,"k":"comment","l":"c_0000039","x":625.0,"y":951.3,"c":1,"n":0,"a":0,"ct":0,"lw":0},{"i":67,"k":"comment","l":"c_0000040","x":160.7,"y":341.7,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":68,"k":"comment","l":"c_0000041","x":176.8,"y":386.5,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":69,"k":"comment","l":"c_0000042","x":528.6,"y":631.5,"c":1,"n":0,"a":0,"ct":0,"lw":0},{"i":70,"k":"comment","l":"c_0000043","x":896.4,"y":931.0,"c":2,"n":0,"a":0,"ct":0,"lw":0},{"i":71,"k":"comment","l":"c_0000044","x":644.3,"y":939.7,"c":1,"n":0,"a":0,"ct":0,"lw":0},{"i":72,"k":"comment","l":"c_0000045","x":896.4,"y":947.5,"c":2,"n":0,"a":0,"ct":0,"lw":0},{"i":73,"k":"comment","l":"c_0000046","x":506.2,"y":701.5,"c":1,"n":0,"a":0,"ct":0,"lw":0},{"i":74,"k":"comment","l":"c_0000047","x":896.4,"y":964.0,"c":2,"n":0,"a":0,"ct":0,"lw":0},{"i":75,"k":"comment","l":"c_0000048","x":412.7,"y":451.3,"c":1,"n":0,"a":0,"ct":0,"lw":0},{"i":76,"k":"comment","l":"c_0000049","x":443.6,"y":221.1,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":77,"k":"comment","l":"c_0000050","x":385.1,"y":217.9,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":78,"k":"player","l":"Yancy Hargrove","x":401.9,"y":285.4,"c":0,"n":32,"a":3,"ct":0,"lw":0},{"i":79,"k":"comment","l":"c_0000051","x":403.0,"y":213.6,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":80,"k":"comment","l":"c_0000052","x":302.3,"y":390.7,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":81,"k":"comment","l":"c_0000053","x":413.9,"y":328.1,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":82,"k":"comment","l":"c_0000054","x":334.1,"y":139.4,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":83,"k":"comment","l":"c_0000055","x":336.8,"y":316.6,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":84,"k":"player","l":"Omar Ellsworth","x":364.5,"y":323.3,"c":0,"n":9,"a":2,"ct":0,"lw":0},{"i":85,"k":"comment","l":"c_0000056","x":369.6,"y":169.8,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":86,"k":"user","l":"glasscleaner_fan8736","x":172.1,"y":185.3,"c":4,"n":15,"a":0,"ct":0,"lw":0},{"i":87,"k":"comment","l":"c_0000057","x":226.8,"y":188.2,"c":4,"n":0,"a":0,"ct":0,"lw":0},{"i":88,"k":"player","l":"Lorenzo Vandergriff","x":185.0,"y":167.7,"c":4,"n":8,"a":0,"ct":0,"lw":0},{"i":89,"k":"comment","l":"c_0000058","x":313.0,"y":170.4,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":90,"k":"comment","l":"c_0000059","x":423.2,"y":273.9,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":91,"k":"comment","l":"c_0000060","x":291.7,"y":335.2,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":92,"k":"comment","l":"c_0000061","x":344.3,"y":334.4,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":93,"k":"comment","l":"c_0000062","x":296.4,"y":356.8,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":94,"k":"comment","l":"c_0000063","x":396.7,"y":230.2,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":95,"k":"comment","l":"c_0000064","x":276.3,"y":352.9,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":96,"k":"comment","l":"c_0000065","x":381.7,"y":184.7,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":97,"k":"comment","l":"c_0000066","x":439.0,"y":268.6,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":98,"k":"comment","l":"c_0000067","x":295.0,"y":188.4,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":99,"k":"player","l":"Jalen Wexler","x":263.1,"y":226.5,"c":0,"n":7,"a":3,"ct":1,"lw":0},{"i":100,"k":"comment","l":"c_0000068","x":400.8,"y":330.7,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":101,"k":"comment","l":"c_0000069","x":320.3,"y":282.4,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":102,"k":"player","l":"Dominic Eastwick","x":359.5,"y":263.6,"c":0,"n":3,"a":0,"ct":0,"lw":0},{"i":103,"k":"comment","l":"c_0000070","x":406.5,"y":309.1,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":104,"k":"comment","l":"c_0000071","x":417.9,"y":264.3,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":105,"k":"player","l":"Roland Duvalier","x":511.3,"y":235.9,"c":0,"n":4,"a":0,"ct":0,"lw":0},{"i":106,"k":"user","l":"swish_sicko3079","x":563.4,"y":374.2,"c":0,"n":1,"a":1,"ct":0,"lw":0},{"i":107,"k":"comment","l":"c_0000072","x":468.7,"y":341.1,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":108,"k":"comment","l":"c_0000073","x":330.0,"y":327.1,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":109,"k":"comment","l":"c_0000074","x":427.6,"y":237.6,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":110,"k":"comment","l":"c_0000075","x":427.0,"y":321.4,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":111,"k":"comment","l":"c_0000076","x":207.1,"y":214.1,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":112,"k":"player","l":"Jalen Petrov","x":180.2,"y":133.6,"c":0,"n":2,"a":0,"ct":1,"lw":0},{"i":113,"k":"comment","l":"c_0000077","x":244.4,"y":158.9,"c":4,"n":0,"a":0,"ct":0,"lw":0},{"i":114,"k":"comment","l":"c_0000078","x":452.7,"y":247.5,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":115,"k":"comment","l":"c_0000079","x":379.1,"y":243.4,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":116,"k":"comment","l":"c_0000080","x":261.2,"y":266.1,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":117,"k":"comment","l":"c_0000081","x":241.2,"y":171.2,"c":4,"n":0,"a":0,"ct":0,"lw":0},{"i":118,"k":"comment","l":"c_0000082","x":319.9,"y":349.8,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":119,"k":"comment","l":"c_0000083","x":337.3,"y":301.3,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":120,"k":"comment","l":"c_0000084","x":413.7,"y":246.3,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":121,"k":"comment","l":"c_0000085","x":329.5,"y":207.3,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":122,"k":"comment","l":"c_0000086","x":352.9,"y":142.6,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":123,"k":"comment","l":"c_0000087","x":431.5,"y":212.1,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":124,"k":"comment","l":"c_0000088","x":435.5,"y":293.5,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":125,"k":"comment","l":"c_0000089","x":360.6,"y":185.9,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":126,"k":"comment","l":"c_0000090","x":284.0,"y":182.2,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":127,"k":"comment","l":"c_0000091","x":422.4,"y":306.0,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":128,"k":"comment","l":"c_0000092","x":259.4,"y":172.2,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":129,"k":"comment","l":"c_0000093","x":401.9,"y":182.3,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":130,"k":"comment","l":"c_0000094","x":391.6,"y":314.5,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":131,"k":"comment","l":"c_0000095","x":256.5,"y":363.0,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":132,"k":"comment","l":"c_0000096","x":373.4,"y":276.2,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":133,"k":"comment","l":"c_0000097","x":339.0,"y":157.0,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":134,"k":"comment","l":"c_0000098","x":343.8,"y":192.0,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":135,"k":"comment","l":"c_0000099","x":420.6,"y":345.0,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":136,"k":"comment","l":"c_0000100","x":417.3,"y":288.5,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":137,"k":"comment","l":"c_0000101","x":303.8,"y":154.8,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":138,"k":"comment","l":"c_0000102","x":433.9,"y":251.2,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":139,"k":"comment","l":"c_0000103","x":228.0,"y":199.8,"c":4,"n":0,"a":0,"ct":0,"lw":0},{"i":140,"k":"comment","l":"c_0000104","x":226.6,"y":280.5,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":141,"k":"comment","l":"c_0000105","x":257.7,"y":314.4,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":142,"k":"comment","l":"c_0000106","x":389.1,"y":168.6,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":143,"k":"comment","l":"c_0000107","x":211.1,"y":224.9,"c":4,"n":0,"a":0,"ct":0,"lw":0},{"i":144,"k":"comment","l":"c_0000108","x":281.2,"y":143.5,"c":4,"n":0,"a":0,"ct":0,"lw":0},{"i":145,"k":"comment","l":"c_0000109","x":230.6,"y":336.8,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":146,"k":"comment","l":"c_0000110","x":249.4,"y":296.4,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":147,"k":"comment","l":"c_0000111","x":896.4,"y":729.3,"c":3,"n":0,"a":0,"ct":0,"lw":0},{"i":148,"k":"comment","l":"c_0000112","x":270.5,"y":373.4,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":149,"k":"comment","l":"c_0000113","x":233.2,"y":321.8,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":150,"k":"comment","l":"c_0000114","x":287.0,"y":374.2,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":151,"k":"comment","l":"c_0000115","x":221.5,"y":209.7,"c":4,"n":0,"a":0,"ct":0,"lw":0},{"i":152,"k":"comment","l":"c_0000116","x":247.2,"y":276.5,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":153,"k":"comment","l":"c_0000117","x":272.3,"y":283.8,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":154,"k":"comment","l":"c_0000118","x":225.4,"y":294.9,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":155,"k":"comment","l":"c_0000119","x":230.4,"y":227.1,"c":4,"n":0,"a":0,"ct":0,"lw":0},{"i":156,"k":"comment","l":"c_0000120","x":283.0,"y":314.4,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":157,"k":"comment","l":"c_0000121","x":116.2,"y":136.4,"c":4,"n":0,"a":0,"ct":0,"lw":0},{"i":158,"k":"comment","l":"c_0000122","x":249.1,"y":346.5,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":159,"k":"comment","l":"c_0000123","x":495.2,"y":249.3,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":160,"k":"comment","l":"c_0000124","x":352.8,"y":378.1,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":161,"k":"comment","l":"c_0000125","x":500.4,"y":284.1,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":162,"k":"comment","l":"c_0000126","x":499.3,"y":313.4,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":163,"k":"comment","l":"c_0000127","x":503.7,"y":263.5,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":164,"k":"comment","l":"c_0000128","x":511.6,"y":283.0,"c":0,"n":0,"a":0,"ct":0,"lw":0},{"i":165,"k":"comment","l":"c_0000129","x":273.0,"y":293.0,"c":0,"n":0,"a":0,"ct":0,"lw":0}],"edges":[{"s":0,"t":1,"a":0,"k":0},{"s":0,"t":22,"a":0,"k":0},{"s":0,"t":36,"a":0,"k":0},{"s":0,"t":67,"a":0,"k":0},{"s":0,"t":68,"a":0,"k":0},{"s":0,"t":80,"a":0,"k":0},{"s":0,"t":83,"a":0,"k":0},{"s":0,"t":91,"a":0,"k":0},{"s":0,"t":92,"a":0,"k":0},{"s":0,"t":93,"a":0,"k":0},{"s":0,"t":95,"a":0,"k":0},{"s":0,"t":101,"a":0,"k":0},{"s":0,"t":108,"a":0,"k":0},{"s":0,"t":116,"a":0,"k":0},{"s":0,"t":118,"a":0,"k":0},{"s":0,"t":119,"a":0,"k":0},{"s":0,"t":131,"a":0,"k":0},{"s":0,"t":140,"a":0,"k":0},{"s":0,"t":141,"a":0,"k":0},{"s":0,"t":145,"a":0,"k":0},{"s":0,"t":146,"a":0,"k":0},{"s":0,"t":148,"a":0,"k":0},{"s":0,"t":149,"a":0,"k":0},{"s":0,"t":150,"a":0,"k":0},{"s":0,"t":152,"a":0,"k":0},{"s":0,"t":153,"a":0,"k":0},{"s":0,"t":154,"a":0,"k":0},{"s":0,"t":156,"a":0,"k":0},{"s":0,"t":158,"a":0,"k":0},{"s":0,"t":160,"a":0,"k":0},{"s":0,"t":165,"a":0,"k":0},{"s":1,"t":2,"a":0,"k":1},{"s":1,"t":3,"a":0,"k":1},{"s":4,"t":5,"a":0,"k":0},{"s":4,"t":18,"a":0,"k":0},{"s":4,"t":24,"a":0,"k":0},{"s":4,"t":33,"a":0,"k":0},{"s":4,"t":38,"a":0,"k":0},{"s":4,"t":53,"a":0,"k":0},{"s":4,"t":55,"a":0,"k":0},{"s":4,"t":56,"a":0,"k":0},{"s":4,"t":62,"a":0,"k":0},{"s":4,"t":63,"a":0,"k":0},{"s":4,"t":70,"a":0,"k":0},{"s":4,"t":72,"a":0,"k":0},{"s":4,"t":74,"a":0,"k":0},{"s":5,"t":6,"a":1,"k":1},{"s":7,"t":8,"a":0,"k":0},{"s":7,"t":15,"a":0,"k":0},{"s":7,"t":16,"a":0,"k":0},{"s":7,"t":17,"a":0,"k":0},{"s":7,"t":23,"a":0,"k":0},{"s":7,"t":29,"a":0,"k":0},{"s":7,"t":32,"a":0,"k":0},{"s":7,"t":37,"a":0,"k":0},{"s":7,"t":47,"a":0,"k":0},{"s":7,"t":51,"a":0,"k":0},{"s":7,"t":52,"a":0,"k":0},{"s":7,"t":147,"a":0,"k":0},{"s":8,"t":9,"a":1,"k":1},{"s":10,"t":11,"a":0,"k":0},{"s":10,"t":77,"a":0,"k":0},{"s":10,"t":79,"a":0,"k":0},{"s":10,"t":85,"a":0,"k":0},{"s":10,"t":94,"a":0,"k":0},{"s":10,"t":96,"a":0,"k":0},{"s":10,"t":115,"a":0,"k":0},{"s":10,"t":121,"a":0,"k":0},{"s":10,"t":125,"a":0,"k":0},{"s":10,"t":129,"a":0,"k":0},{"s":10,"t":132,"a":0,"k":0},{"s":10,"t":134,"a":0,"k":0},{"s":10,"t":142,"a":0,"k":0},{"s":11,"t":12,"a":0,"k":1},{"s":11,"t":13,"a":0,"k":1},{"s":11,"t":14,"a":0,"k":1},{"s":15,"t":9,"a":1,"k":1},{"s":16,"t":9,"a":1,"k":1},{"s":17,"t":9,"a":1,"k":1},{"s":18,"t":6,"a":1,"k":1},{"s":19,"t":20,"a":0,"k":0},{"s":19,"t":75,"a":0,"k":0},{"s":20,"t":12,"a":0,"k":1},{"s":20,"t":21,"a":0,"k":1},{"s":22,"t":12,"a":0,"k":1},{"s":23,"t":9,"a":1,"k":1},{"s":24,"t":6,"a":1,"k":1},{"s":25,"t":26,"a":0,"k":0},{"s":25,"t":50,"a":0,"k":0},{"s":25,"t":54,"a":0,"k":0},{"s":25,"t":69,"a":0,"k":0},{"s":25,"t":73,"a":0,"k":0},{"s":26,"t":27,"a":0,"k":1},{"s":26,"t":28,"a":0,"k":1},{"s":29,"t":9,"a":1,"k":1},{"s":30,"t":31,"a":0,"k":0},{"s":30,"t":76,"a":0,"k":0},{"s":30,"t":81,"a":0,"k":0},{"s":30,"t":90,"a":0,"k":0},{"s":30,"t":97,"a":0,"k":0},{"s":30,"t":100,"a":0,"k":0},{"s":30,"t":103,"a":0,"k":0},{"s":30,"t":104,"a":0,"k":0},{"s":30,"t":109,"a":0,"k":0},{"s":30,"t":110,"a":0,"k":0},{"s":30,"t":114,"a":0,"k":0},{"s":30,"t":120,"a":0,"k":0},{"s":30,"t":123,"a":0,"k":0},{"s":30,"t":124,"a":0,"k":0},{"s":30,"t":127,"a":0,"k":0},{"s":30,"t":130,"a":0,"k":0},{"s":30,"t":135,"a":0,"k":0},{"s":30,"t":136,"a":0,"k":0},{"s":30,"t":138,"a":0,"k":0},{"s":30,"t":159,"a":0,"k":0},{"s":30,"t":161,"a":0,"k":0},{"s":30,"t":162,"a":0,"k":0},{"s":30,"t":163,"a":0,"k":0},{"s":30,"t":164,"a":0,"k":0},{"s":31,"t":12,"a":0,"k":1},{"s":32,"t":9,"a":1,"k":1},{"s":33,"t":6,"a":1,"k":1},{"s":34,"t":35,"a":0,"k":0},{"s":34,"t":60,"a":0,"k":0},{"s":34,"t":82,"a":0,"k":0},{"s":34,"t":89,"a":0,"k":0},{"s":34,"t":98,"a":0,"k":0},{"s":34,"t":122,"a":0,"k":0},{"s":34,"t":126,"a":0,"k":0},{"s":34,"t":128,"a":0,"k":0},{"s":34,"t":133,"a":0,"k":0},{"s":34,"t":137,"a":0,"k":0},{"s":35,"t":12,"a":1,"k":1},{"s":36,"t":12,"a":0,"k":1},{"s":36,"t":3,"a":0,"k":1},{"s":37,"t":9,"a":1,"k":1},{"s":38,"t":6,"a":1,"k":1},{"s":39,"t":40,"a":0,"k":0},{"s":40,"t":28,"a":0,"k":1},{"s":40,"t":21,"a":0,"k":1},{"s":40,"t":41,"a":0,"k":1},{"s":42,"t":43,"a":0,"k":0},{"s":42,"t":44,"a":0,"k":0},{"s":42,"t":57,"a":0,"k":0},{"s":42,"t":66,"a":0,"k":0},{"s":42,"t":71,"a":0,"k":0},{"s":43,"t":28,"a":0,"k":1},{"s":44,"t":28,"a":0,"k":1},{"s":44,"t":45,"a":0,"k":1},{"s":44,"t":21,"a":0,"k":1},{"s":44,"t":41,"a":0,"k":1},{"s":44,"t":46,"a":0,"k":1},{"s":47,"t":9,"a":1,"k":1},{"s":48,"t":49,"a":0,"k":0},{"s":49,"t":41,"a":0,"k":1},{"s":49,"t":45,"a":0,"k":1},{"s":50,"t":27,"a":0,"k":1},{"s":50,"t":46,"a":0,"k":1},{"s":51,"t":9,"a":1,"k":1},{"s":52,"t":9,"a":1,"k":1},{"s":53,"t":6,"a":1,"k":1},{"s":54,"t":27,"a":0,"k":1},{"s":54,"t":12,"a":1,"k":1},{"s":55,"t":6,"a":1,"k":1},{"s":56,"t":6,"a":1,"k":1},{"s":57,"t":28,"a":0,"k":1},{"s":57,"t":45,"a":0,"k":1},{"s":58,"t":59,"a":0,"k":0},{"s":58,"t":113,"a":0,"k":0},{"s":58,"t":117,"a":0,"k":0},{"s":58,"t":144,"a":0,"k":0},{"s":59,"t":12,"a":0,"k":1},{"s":60,"t":12,"a":0,"k":1},{"s":60,"t":61,"a":0,"k":1},{"s":62,"t":6,"a":1,"k":1},{"s":63,"t":6,"a":1,"k":1},{"s":64,"t":65,"a":0,"k":0},{"s":65,"t":2,"a":0,"k":1},{"s":65,"t":3,"a":0,"k":1},{"s":66,"t":45,"a":0,"k":1},{"s":67,"t":3,"a":0,"k":1},{"s":67,"t":2,"a":0,"k":1},{"s":68,"t":3,"a":0,"k":1},{"s":69,"t":27,"a":0,"k":1},{"s":70,"t":6,"a":1,"k":1},{"s":71,"t":45,"a":0,"k":1},{"s":72,"t":6,"a":1,"k":1},{"s":73,"t":27,"a":0,"k":1},{"s":73,"t":41,"a":1,"k":1},{"s":74,"t":6,"a":1,"k":1},{"s":75,"t":27,"a":0,"k":1},{"s":75,"t":12,"a":0,"k":1},{"s":76,"t":12,"a":0,"k":1},{"s":77,"t":12,"a":0,"k":1},{"s":77,"t":78,"a":1,"k":1},{"s":79,"t":12,"a":1,"k":1},{"s":79,"t":78,"a":0,"k":1},{"s":80,"t":12,"a":0,"k":1},{"s":80,"t":13,"a":0,"k":1},{"s":81,"t":12,"a":1,"k":1},{"s":81,"t":78,"a":0,"k":1},{"s":82,"t":12,"a":0,"k":1},{"s":83,"t":12,"a":1,"k":1},{"s":83,"t":78,"a":0,"k":1},{"s":83,"t":84,"a":0,"k":1},{"s":85,"t":12,"a":1,"k":1},{"s":86,"t":87,"a":0,"k":0},{"s":86,"t":111,"a":0,"k":0},{"s":86,"t":139,"a":0,"k":0},{"s":86,"t":143,"a":0,"k":0},{"s":86,"t":151,"a":0,"k":0},{"s":86,"t":155,"a":0,"k":0},{"s":86,"t":157,"a":0,"k":0},{"s":87,"t":12,"a":0,"k":1},{"s":87,"t":88,"a":0,"k":1},{"s":89,"t":12,"a":0,"k":1},{"s":90,"t":78,"a":0,"k":1},{"s":90,"t":12,"a":0,"k":1},{"s":91,"t":12,"a":1,"k":1},{"s":92,"t":12,"a":0,"k":1},{"s":92,"t":78,"a":0,"k":1},{"s":92,"t":84,"a":0,"k":1},{"s":93,"t":12,"a":0,"k":1},{"s":94,"t":12,"a":1,"k":1},{"s":94,"t":78,"a":1,"k":1},{"s":95,"t":12,"a":0,"k":1},{"s":96,"t":12,"a":1,"k":1},{"s":97,"t":12,"a":0,"k":1},{"s":97,"t":78,"a":0,"k":1},{"s":98,"t":12,"a":0,"k":1},{"s":98,"t":99,"a":1,"k":1},{"s":100,"t":12,"a":1,"k":1},{"s":100,"t":78,"a":0,"k":1},{"s":101,"t":12,"a":0,"k":1},{"s":101,"t":78,"a":0,"k":1},{"s":101,"t":84,"a":0,"k":1},{"s":101,"t":102,"a":0,"k":1},{"s":101,"t":99,"a":1,"k":1},{"s":103,"t":78,"a":0,"k":1},{"s":103,"t":12,"a":0,"k":1},{"s":104,"t":12,"a":0,"k":1},{"s":104,"t":78,"a":0,"k":1},{"s":104,"t":84,"a":0,"k":1},{"s":104,"t":102,"a":0,"k":1},{"s":104,"t":105,"a":0,"k":1},{"s":106,"t":107,"a":0,"k":0},{"s":107,"t":12,"a":1,"k":1},{"s":108,"t":78,"a":0,"k":1},{"s":108,"t":12,"a":0,"k":1},{"s":109,"t":78,"a":0,"k":1},{"s":109,"t":12,"a":0,"k":1},{"s":110,"t":12,"a":0,"k":1},{"s":110,"t":78,"a":0,"k":1},{"s":111,"t":12,"a":0,"k":1},{"s":111,"t":88,"a":0,"k":1},{"s":111,"t":99,"a":0,"k":1},{"s":111,"t":112,"a":0,"k":1},{"s":111,"t":2,"a":0,"k":1},{"s":113,"t":12,"a":0,"k":1},{"s":113,"t":88,"a":0,"k":1},{"s":114,"t":12,"a":0,"k":1},{"s":114,"t":78,"a":0,"k":1},{"s":114,"t":105,"a":0,"k":1},{"s":115,"t":12,"a":0,"k":1},{"s":115,"t":78,"a":0,"k":1},{"s":116,"t":12,"a":0,"k":1},{"s":117,"t":12,"a":0,"k":1},{"s":117,"t":88,"a":0,"k":1},{"s":118,"t":84,"a":0,"k":1},{"s":118,"t":12,"a":0,"k":1},{"s":119,"t":12,"a":0,"k":1},{"s":119,"t":78,"a":1,"k":1},{"s":119,"t":84,"a":1,"k":1},{"s":119,"t":102,"a":0,"k":1},{"s":120,"t":12,"a":1,"k":1},{"s":120,"t":78,"a":0,"k":1},{"s":121,"t":12,"a":0,"k":1},{"s":122,"t":12,"a":0,"k":1},{"s":123,"t":12,"a":0,"k":1},{"s":124,"t":78,"a":0,"k":1},{"s":124,"t":12,"a":0,"k":1},{"s":125,"t":12,"a":0,"k":1},{"s":126,"t":12,"a":0,"k":1},{"s":126,"t":99,"a":1,"k":1},{"s":127,"t":78,"a":0,"k":1},{"s":127,"t":12,"a":0,"k":1},{"s":128,"t":12,"a":0,"k":1},{"s":128,"t":99,"a":0,"k":1},{"s":128,"t":112,"a":0,"k":1},{"s":129,"t":12,"a":0,"k":1},{"s":130,"t":12,"a":0,"k":1},{"s":130,"t":84,"a":0,"k":1},{"s":131,"t":12,"a":0,"k":1},{"s":132,"t":12,"a":0,"k":1},{"s":132,"t":78,"a":0,"k":1},{"s":132,"t":84,"a":1,"k":1},{"s":133,"t":12,"a":0,"k":1},{"s":134,"t":12,"a":1,"k":1},{"s":135,"t":12,"a":0,"k":1},{"s":136,"t":12,"a":0,"k":1},{"s":136,"t":78,"a":0,"k":1},{"s":137,"t":12,"a":1,"k":1},{"s":138,"t":12,"a":0,"k":1},{"s":138,"t":78,"a":0,"k":1},{"s":139,"t":12,"a":0,"k":1},{"s":139,"t":88,"a":0,"k":1},{"s":140,"t":12,"a":0,"k":1},{"s":140,"t":2,"a":0,"k":1},{"s":141,"t":12,"a":0,"k":1},{"s":142,"t":12,"a":1,"k":1},{"s":143,"t":12,"a":0,"k":1},{"s":143,"t":88,"a":0,"k":1},{"s":144,"t":12,"a":0,"k":1},{"s":145,"t":12,"a":0,"k":1},{"s":145,"t":3,"a":0,"k":1},{"s":146,"t":12,"a":0,"k":1},{"s":147,"t":9,"a":0,"k":1},{"s":148,"t":12,"a":0,"k":1},{"s":149,"t":12,"a":0,"k":1},{"s":149,"t":3,"a":0,"k":1},{"s":150,"t":12,"a":0,"k":1},{"s":151,"t":12,"a":0,"k":1},{"s":151,"t":88,"a":0,"k":1},{"s":152,"t":12,"a":0,"k":1},{"s":153,"t":12,"a":0,"k":1},{"s":153,"t":3,"a":0,"k":1},{"s":153,"t":78,"a":0,"k":1},{"s":153,"t":2,"a":0,"k":1},{"s":153,"t":99,"a":0,"k":1},{"s":154,"t":12,"a":0,"k":1},{"s":154,"t":2,"a":0,"k":1},{"s":155,"t":12,"a":0,"k":1},{"s":156,"t":12,"a":0,"k":1},{"s":157,"t":88,"a":0,"k":1},{"s":158,"t":12,"a":0,"k":1},{"s":159,"t":78,"a":0,"k":1},{"s":160,"t":78,"a":0,"k":1},{"s":160,"t":84,"a":0,"k":1},{"s":160,"t":14,"a":0,"k":1},{"s":161,"t":78,"a":0,"k":1},{"s":161,"t":105,"a":0,"k":1},{"s":162,"t":78,"a":0,"k":1},{"s":163,"t":78,"a":0,"k":1},{"s":163,"t":105,"a":0,"k":1},{"s":164,"t":78,"a":0,"k":1},{"s":165,"t":12,"a":0,"k":1},{"s":165,"t":3,"a":0,"k":1},{"s":165,"t":99,"a":0,"k":1},{"s":165,"t":78,"a":0,"k":1},{"s":165,"t":2,"a":0,"k":1}],"dedges":[{"s":0,"t":2,"n":6,"a":0},{"s":0,"t":3,"n":8,"a":0},{"s":0,"t":12,"n":27,"a":2},{"s":0,"t":13,"n":1,"a":0},{"s":0,"t":78,"n":8,"a":1},{"s":0,"t":84,"n":6,"a":1},{"s":0,"t":102,"n":2,"a":0},{"s":0,"t":99,"n":3,"a":1},{"s":0,"t":14,"n":1,"a":0},{"s":4,"t":6,"n":13,"a":13},{"s":7,"t":9,"n":12,"a":11},{"s":10,"t":12,"n":13,"a":6},{"s":10,"t":13,"n":1,"a":0},{"s":10,"t":14,"n":1,"a":0},{"s":10,"t":78,"n":5,"a":2},{"s":10,"t":84,"n":1,"a":1},{"s":19,"t":12,"n":2,"a":0},{"s":19,"t":21,"n":1,"a":0},{"s":19,"t":27,"n":1,"a":0},{"s":25,"t":27,"n":5,"a":0},{"s":25,"t":28,"n":1,"a":0},{"s":25,"t":46,"n":1,"a":0},{"s":25,"t":12,"n":1,"a":1},{"s":25,"t":41,"n":1,"a":1},{"s":30,"t":12,"n":19,"a":3},{"s":30,"t":78,"n":19,"a":0},{"s":30,"t":84,"n":2,"a":0},{"s":30,"t":102,"n":1,"a":0},{"s":30,"t":105,"n":4,"a":0},{"s":34,"t":12,"n":10,"a":2},{"s":34,"t":61,"n":1,"a":0},{"s":34,"t":99,"n":3,"a":2},{"s":34,"t":112,"n":1,"a":0},{"s":39,"t":28,"n":1,"a":0},{"s":39,"t":21,"n":1,"a":0},{"s":39,"t":41,"n":1,"a":0},{"s":42,"t":28,"n":3,"a":0},{"s":42,"t":45,"n":4,"a":0},{"s":42,"t":21,"n":1,"a":0},{"s":42,"t":41,"n":1,"a":0},{"s":42,"t":46,"n":1,"a":0},{"s":48,"t":41,"n":1,"a":0},{"s":48,"t":45,"n":1,"a":0},{"s":58,"t":12,"n":4,"a":0},{"s":58,"t":88,"n":2,"a":0},{"s":64,"t":2,"n":1,"a":0},{"s":64,"t":3,"n":1,"a":0},{"s":86,"t":12,"n":6,"a":0},{"s":86,"t":88,"n":6,"a":0},{"s":86,"t":99,"n":1,"a":0},{"s":86,"t":112,"n":1,"a":0},{"s":86,"t":2,"n":1,"a":0},{"s":106,"t":12,"n":1,"a":1}],"comms":[0,1,2,3,4],"title":"toy","note":"","dataset_note":"Players are the only target type here.","n_contested":4,"n_wolves":2,"colour":{"user":"#2f6fdb","comment":"#c9ccd1","player":"#e08b2a","team":"#2e9e6b","other_target":"#b04a4a"},"shape":{"user":"circle","comment":"square","player":"triangle","team":"diamond","other_target":"cross"}};
+document.getElementById('title').textContent = D.title;
+document.getElementById('note').textContent = D.note;
+
+const svg = document.getElementById('svg'), tip = document.getElementById('tip'),
+      hud = document.getElementById('hud'), NS = 'http://www.w3.org/2000/svg';
+const gRoot = document.createElementNS(NS,'g'),
+      gEdge = document.createElementNS(NS,'g'),
+      gNode = document.createElementNS(NS,'g');
+gRoot.appendChild(gEdge); gRoot.appendChild(gNode); svg.appendChild(gRoot);
+
+const kindsPresent = [...new Set(D.nodes.map(n=>n.k))];
+const state = {kinds:new Set(kindsPresent), comms:new Set(D.comms),
+               allComm:true, abuseOnly:false, hideAuthored:false,
+               eop:.35, nsz:1, q:'', focus:false,
+               markContested:false, markWolves:false};
+document.getElementById('nct').textContent = D.n_contested||'';
+document.getElementById('nlw').textContent = D.n_wolves||'';
+
+// ---- guided tour: each step sets the controls and asks a question ---------
+const TOUR = [
+ {n:'0. everything', q:'Start here. Grey squares are comments and there are far '
+   + 'more of them than anything else \u2014 that is why the picture is dense. '
+   + 'Turn them off and see what is left.',
+  set:{kinds:kindsPresent, abuseOnly:false, hideAuthored:false, markContested:false,
+       markWolves:false, allComm:true}},
+ {n:'1. the sandwich', q:'Only users and comments. Every comment has exactly one '
+   + 'incoming edge \u2014 its author. Why is a comment\u2019s in-degree therefore '
+   + 'useless as a measure of anything?',
+  set:{kinds:['user','comment'], abuseOnly:false, hideAuthored:false}},
+ {n:'2. who talks about whom', q:'Users and targets, comments hidden. Two users are '
+   + 'connected only by the targets they share. That is the mechanism community '
+   + 'detection is using \u2014 not magic.',
+  set:{kinds:kindsPresent.filter(k=>k!=='comment'), hideAuthored:false, abuseOnly:false}},
+ {n:'3. only abuse', q:'Now only is_abusive = YES edges. Is the busiest user also '
+   + 'the one with the most red? Hover the biggest circles and compare.',
+  set:{kinds:kindsPresent, abuseOnly:true, hideAuthored:true}},
+ {n:'4. lone wolves', q:'Highlighted: users who are active but share almost nothing '
+   + 'with anyone else. Follow their edges \u2014 how many different people do they '
+   + 'talk about?',
+  set:{kinds:kindsPresent.filter(k=>k!=='comment'), abuseOnly:false,
+       hideAuthored:false, markWolves:true, markContested:false}},
+ {n:'5. contested targets',
+  q: D.n_contested
+   ? 'Highlighted in magenta: targets discussed by more than one community. '
+   + 'These are the reason the communities are not separate islands. What '
+   + 'happens to the picture if you hide one community?'
+   : 'Nothing is highlighted, and that is the finding: no target here is '
+   + 'discussed by more than one community. The groups are separate '
+   + 'components, so the algorithm did no work -- finding them was not a '
+   + 'result. Check again at the next dataset up.',
+  set:{kinds:kindsPresent.filter(k=>k!=='comment'), abuseOnly:false,
+       markContested:true, markWolves:false}},
+ {n:'6. one community', q:'Untick every community but one. Who does this group talk '
+   + 'about, and is that different from the next group? If it is not, the '
+   + '\u201ccommunities\u201d may be structural only.',
+  set:{kinds:kindsPresent.filter(k=>k!=='comment'), abuseOnly:false,
+       markContested:true, markWolves:false}},
+];
+const tb = document.getElementById('tour');
+TOUR.forEach((t,i)=>{
+  const b=document.createElement('button');
+  b.className='tourbtn'; b.textContent=t.n;
+  b.onclick=()=>{applyTour(i);};
+  tb.appendChild(b);
+});
+let tourStep = 0;
+document.getElementById('prev').onclick=()=>applyTour(Math.max(0,tourStep-1));
+document.getElementById('next').onclick=()=>applyTour(Math.min(TOUR.length-1,tourStep+1));
+function applyTour(i){
+  tourStep = i;
+  const t=TOUR[i];
+  [...tb.children].forEach((b,j)=>b.classList.toggle('on',j===i));
+  document.getElementById('question').textContent = t.q;
+  const st=t.set;
+  if(st.kinds){ state.kinds=new Set(st.kinds);
+    document.querySelectorAll('#kinds input').forEach(inp=>{
+      inp.checked = state.kinds.has(inp.dataset.k); }); }
+  for(const k of ['abuseOnly','hideAuthored','markContested','markWolves','focus']){
+    if(k in st){ state[k]=st[k]; const el=document.getElementById(k); if(el) el.checked=st[k]; }
+  }
+  if(st.allComm){ state.allComm=true; state.comms=new Set(D.comms);
+    document.getElementById('allComm').checked=true;
+    document.querySelectorAll('#comms input').forEach(i=>i.checked=true); }
+  draw();
+}
+
+// ---- controls -------------------------------------------------------------
+const kb = document.getElementById('kinds');
+kindsPresent.forEach(k=>{
+  const l=document.createElement('label');
+  l.innerHTML = `<input type="checkbox" checked data-k="${k}">
+    <span class="sw" style="background:${D.colour[k]}"></span>${k.replace('_',' ')}
+    <span style="margin-left:auto;color:#888">${D.nodes.filter(n=>n.k===k).length}</span>`;
+  l.querySelector('input').onchange = e => {
+    e.target.checked ? state.kinds.add(k) : state.kinds.delete(k); draw();
+  };
+  kb.appendChild(l);
+});
+const cb = document.getElementById('comms');
+D.comms.forEach(c=>{
+  const l=document.createElement('label');
+  const n = D.nodes.filter(x=>x.k==='user'&&x.c===c).length;
+  l.innerHTML = `<input type="checkbox" checked data-c="${c}">
+    <span class="sw" style="background:${hsl(c)}"></span>community ${c}
+    <span style="margin-left:auto;color:#888">${n}</span>`;
+  l.querySelector('input').onchange = e => {
+    e.target.checked ? state.comms.add(c) : state.comms.delete(c);
+    state.allComm = state.comms.size === D.comms.length;
+    document.getElementById('allComm').checked = state.allComm; draw();
+  };
+  cb.appendChild(l);
+});
+document.getElementById('allComm').onchange = e=>{
+  state.allComm = e.target.checked;
+  state.comms = e.target.checked ? new Set(D.comms) : new Set();
+  cb.querySelectorAll('input').forEach(i=>i.checked=e.target.checked); draw();
+};
+const bind=(id,f)=>document.getElementById(id).addEventListener('input',e=>{f(e);draw();});
+bind('abuseOnly',e=>state.abuseOnly=e.target.checked);
+bind('hideAuthored',e=>state.hideAuthored=e.target.checked);
+bind('eop',e=>state.eop=e.target.value/100);
+bind('nsz',e=>state.nsz=e.target.value/100);
+bind('q',e=>state.q=e.target.value.toLowerCase());
+bind('focus',e=>state.focus=e.target.checked);
+bind('markContested',e=>state.markContested=e.target.checked);
+bind('markWolves',e=>state.markWolves=e.target.checked);
+
+function hsl(c){ if(c<0) return '#999';
+  const g=[ '#2f6fdb','#e08b2a','#2e9e6b','#c2417f','#8b5fc0','#d4b106','#0f9ba6',
+            '#b04a4a','#4a7f2e','#7a5c3b','#5b7fa6','#a63a8f' ]; return g[c%g.length]; }
+
+// ---- adjacency for the focus mode ----------------------------------------
+const nbr = D.nodes.map(()=>[]);
+D.edges.forEach(e=>{ nbr[e.s].push(e.t); nbr[e.t].push(e.s); });
+
+function visibleNode(n, hits){
+  if(!state.kinds.has(n.k)) return false;
+  if(n.k==='user' && n.c>=0 && !state.comms.has(n.c)) return false;
+  if(state.focus && hits.size && !hits.has(n.i)) return false;
+  return true;
+}
+
+function draw(){
+  const hits = new Set();
+  if(state.q){
+    D.nodes.forEach(n=>{ if(n.l.toLowerCase().includes(state.q)){
+      hits.add(n.i); nbr[n.i].forEach(j=>{hits.add(j); nbr[j].forEach(k=>hits.add(k));});
+    }});
+  }
+  const vis = new Uint8Array(D.nodes.length);
+  D.nodes.forEach(n=>{ vis[n.i] = visibleNode(n,hits)?1:0; });
+
+  let eh='';
+  let shown=0;
+  const collapsed = !state.kinds.has('comment');
+  if(collapsed){
+    // comments are hidden: draw the two-hop user->target paths instead, or the
+    // picture would have no edges at all
+    for(const e of D.dedges){
+      if(!vis[e.s]||!vis[e.t]) continue;
+      if(state.abuseOnly && !e.a) continue;
+      const a=D.nodes[e.s], b=D.nodes[e.t];
+      const col = e.a ? '#cc2b2b' : '#9aa1ab';
+      const w = Math.min(4, .6 + (e.a?e.a:e.n)*.5);
+      eh += `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="${col}"
+              stroke-width="${w}" stroke-opacity="${e.a?Math.min(1,state.eop+.45):state.eop+.15}"/>`;
+      shown++;
+    }
+  } else {
+    for(const e of D.edges){
+      if(!vis[e.s]||!vis[e.t]) continue;
+      if(state.abuseOnly && !e.a) continue;
+      if(state.hideAuthored && e.k===0) continue;
+      const a=D.nodes[e.s], b=D.nodes[e.t];
+      const col = e.a ? '#cc2b2b' : (e.k===0 ? '#9aa1ab' : '#c3c8cf');
+      const w = e.a ? 1.6 : .7;
+      eh += `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="${col}"
+              stroke-width="${w}" stroke-opacity="${e.a?Math.min(1,state.eop+.45):state.eop}"/>`;
+      shown++;
+    }
+  }
+  gEdge.innerHTML = eh;
+
+  const marking = state.markContested || state.markWolves;
+  let halo='', nh='', nshown=0;
+  for(const n of D.nodes){
+    if(!vis[n.i]) continue;
+    nshown++;
+    const base = n.k==='comment' ? 2.2 : (n.k==='user' ? 5.5 : 4.4);
+    const r = base * state.nsz * (n.k==='user' ? (1+Math.min(n.n,60)/60) : 1);
+    const fill = n.k==='user' ? hsl(n.c) : D.colour[n.k];
+    let stroke='#33373d', sw=.5, rr=r, marked=false, op=1;
+    if(n.k!=='comment' && n.n && n.a/n.n > .3){ stroke='#cc2b2b'; sw=1.6; }
+    if(state.markContested && n.ct){
+      stroke='#d81b8c'; sw=2.6; rr=r*1.6; marked=true;
+      halo += `<circle cx="${n.x}" cy="${n.y}" r="${r*4.5}" fill="#d81b8c" fill-opacity=".16"
+                stroke="#d81b8c" stroke-opacity=".55" stroke-width="1.4"/>`;
+    }
+    if(state.markWolves && n.lw){
+      stroke='#0f9ba6'; sw=3; rr=r*1.7; marked=true;
+      halo += `<circle cx="${n.x}" cy="${n.y}" r="${r*4.5}" fill="#0f9ba6" fill-opacity=".16"
+                stroke="#0f9ba6" stroke-opacity=".55" stroke-width="1.4"/>`;
+    }
+    // dim everything that is not marked, so a handful of marked nodes among
+    // hundreds is actually findable
+    if(marking && !marked) op = n.k==='comment' ? .12 : .3;
+    nh += shapeSVG(n, rr, fill, stroke, sw, op);
+  }
+  gNode.innerHTML = halo + nh;
+  hud.textContent = `${nshown} nodes / ${shown} `
+    + (collapsed ? 'user\u2192target edges (comments collapsed)' : 'edges') + ' shown';
+  // live stats for whatever is currently visible -- the panel is part of the
+  // lesson: change the selection, watch the abuse rate move
+  let ti=0, ta=0, nu=0;
+  for(const n of D.nodes){ if(!vis[n.i]) continue;
+    if(n.k==='user'){ nu++; ti+=n.n; ta+=n.a; } }
+  const rate = ti ? (ta/ti) : 0;
+  document.getElementById('stats').innerHTML =
+    `<b>${nu}</b> users visible<br><b>${ti}</b> interactions, <b>${ta}</b> abusive`
+    + `<br>abuse rate <b>${ti?rate.toFixed(3):'-'}</b>`
+    + (D.dataset_note?`<br><span style="color:#888">${D.dataset_note}</span>`:'');
+}
+
+function shapeSVG(n,r,fill,stroke,sw,op){
+  const o = (op===undefined||op===1) ? '' : ` opacity="${op}"`;
+  const c=`fill="${fill}" stroke="${stroke}" stroke-width="${sw}" data-i="${n.i}"${o}`;
+  switch(D.shape[n.k]){
+    case 'square': return `<rect x="${n.x-r}" y="${n.y-r}" width="${2*r}" height="${2*r}" ${c}/>`;
+    case 'triangle': return `<polygon points="${n.x},${n.y-r*1.2} ${n.x-r},${n.y+r*.8} ${n.x+r},${n.y+r*.8}" ${c}/>`;
+    case 'diamond': return `<polygon points="${n.x},${n.y-r*1.2} ${n.x+r*1.1},${n.y} ${n.x},${n.y+r*1.2} ${n.x-r*1.1},${n.y}" ${c}/>`;
+    case 'cross': return `<path d="M${n.x-r},${n.y-r}L${n.x+r},${n.y+r}M${n.x+r},${n.y-r}L${n.x-r},${n.y+r}" fill="none" stroke="${fill}" stroke-width="${Math.max(1.4,r/2)}" data-i="${n.i}"${o}/>`;
+    default: return `<circle cx="${n.x}" cy="${n.y}" r="${r}" ${c}/>`;
+  }
+}
+
+// ---- pan / zoom -----------------------------------------------------------
+let vb={x:-60,y:-60,w:1120,h:1120};
+function apply(){ svg.setAttribute('viewBox',`${vb.x} ${vb.y} ${vb.w} ${vb.h}`); }
+apply(); applyTour(0);
+document.getElementById('reset').onclick=()=>{vb={x:-60,y:-60,w:1120,h:1120};apply();};
+svg.addEventListener('wheel',e=>{
+  e.preventDefault();
+  const k = e.deltaY>0?1.12:1/1.12, r=svg.getBoundingClientRect();
+  const mx=vb.x+(e.clientX-r.left)/r.width*vb.w, my=vb.y+(e.clientY-r.top)/r.height*vb.h;
+  vb.x=mx-(mx-vb.x)*k; vb.y=my-(my-vb.y)*k; vb.w*=k; vb.h*=k; apply();
+},{passive:false});
+let drag=null;
+svg.addEventListener('mousedown',e=>{drag={x:e.clientX,y:e.clientY,vx:vb.x,vy:vb.y};svg.classList.add('drag');});
+addEventListener('mouseup',()=>{drag=null;svg.classList.remove('drag');});
+addEventListener('mousemove',e=>{
+  if(drag){ const r=svg.getBoundingClientRect();
+    vb.x=drag.vx-(e.clientX-drag.x)/r.width*vb.w;
+    vb.y=drag.vy-(e.clientY-drag.y)/r.height*vb.h; apply(); return; }
+  const t=e.target.dataset && e.target.dataset.i;
+  if(t!==undefined && t!==null){
+    const n=D.nodes[+t];
+    const rate = n.n ? (n.a/n.n).toFixed(2) : '-';
+    tip.innerHTML = `<b>${n.l}</b><br>${n.k}`
+      + (n.k==='user'?`<br>community ${n.c}`:'')
+      + (n.n?`<br>${n.n} interactions, ${n.a} abusive (rate ${rate})`:'');
+    tip.style.opacity=1;
+    tip.style.left=(e.clientX-250+12)+'px'; tip.style.top=(e.clientY+12)+'px';
+  } else tip.style.opacity=0;
+});
+</script>

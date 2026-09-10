@@ -1,0 +1,100 @@
+submission_id,subreddit,submission_title,submission_body,submission_score,author_username,submission_url,submission_timestamp,submission_kind,game_id,related_team_ids
+s_000000,CollegeBasketballSynthetic,"[Post Game Thread] Lakeshore Poly defeats Juniper Ridge A&M, 82-70","Box Score
+
+Team | 1H | 2H | Final",21,freethrow_nerd9850,https://example.invalid/synthetic,2025-11-10 20:00:00 UTC,post_game_thread,men|2025-2026|G00025|men_JUNI_juniper-ridge-a-m-timberwolves|men_LAKE_lakeshore-poly-ironmen,men_JUNI_juniper-ridge-a-m-timberwolves|men_LAKE_lakeshore-poly-ironmen
+s_000001,CollegeBasketballSynthetic,"[Post Game Thread] Gulliford University defeats Lakeshore Poly, 92-75","Box Score
+
+Team | 1H | 2H | Final",10,freethrow_fan9576,https://example.invalid/synthetic,2025-11-20 00:00:00 UTC,post_game_thread,men|2025-2026|G00022|men_LAKE_lakeshore-poly-ironmen|men_GULL_gulliford-university-sabers,men_LAKE_lakeshore-poly-ironmen|men_GULL_gulliford-university-sabers
+s_000002,CollegeBasketballSynthetic,"[Post Game Thread] Gulliford University defeats Windmere State, 86-65","Box Score
+
+Team | 1H | 2H | Final",16,screenassist_truther7502,https://example.invalid/synthetic,2025-11-25 20:30:00 UTC,post_game_thread,men|2025-2026|G00026|men_WIND_windmere-state-ravens|men_GULL_gulliford-university-sabers,men_WIND_windmere-state-ravens|men_GULL_gulliford-university-sabers
+s_000003,CollegeBasketballSynthetic,"[Post Game Thread] Lakeshore Poly defeats Juniper Ridge A&M, 75-59","Box Score
+
+Team | 1H | 2H | Final",28,freethrow_fan9576,https://example.invalid/synthetic,2025-11-26 00:00:00 UTC,post_game_thread,men|2025-2026|G00014|men_LAKE_lakeshore-poly-ironmen|men_JUNI_juniper-ridge-a-m-timberwolves,men_LAKE_lakeshore-poly-ironmen|men_JUNI_juniper-ridge-a-m-timberwolves
+s_000004,CollegeBasketballSynthetic,"[Post Game Thread] Inglewood Bay College defeats Tidewater Tech, 72-58","Box Score
+
+Team | 1H | 2H | Final",130,hardwood_casual6332,https://example.invalid/synthetic,2025-11-28 22:30:00 UTC,post_game_thread,men|2025-2026|G00020|men_TIDE_tidewater-tech-cyclones|men_INGL_inglewood-bay-college-mariners,men_TIDE_tidewater-tech-cyclones|men_INGL_inglewood-bay-college-mariners
+s_000005,CollegeBasketballSynthetic,"[Post Game Thread] Inglewood Bay College defeats Tidewater Tech, 80-73","Box Score
+
+Team | 1H | 2H | Final",160,elbowjumper_poster5233,https://example.invalid/synthetic,2025-12-01 22:00:00 UTC,post_game_thread,men|2025-2026|G00009|men_INGL_inglewood-bay-college-mariners|men_TIDE_tidewater-tech-cyclones,men_INGL_inglewood-bay-college-mariners|men_TIDE_tidewater-tech-cyclones
+s_000006,CollegeBasketballSynthetic,"[Post Game Thread] Gulliford University defeats Dunmore, 73-72","Box Score
+
+Team | 1H | 2H | Final",55,midrange_watcher7912,https://example.invalid/synthetic,2025-12-04 21:00:00 UTC,post_game_thread,men|2025-2026|G00019|men_GULL_gulliford-university-sabers|men_DUNM_dunmore-foxes,men_GULL_gulliford-university-sabers|men_DUNM_dunmore-foxes
+s_000007,CollegeBasketballSynthetic,"[Post Game Thread] Juniper Ridge A&M defeats Lakeshore Poly, 80-79","Box Score
+
+Team | 1H | 2H | Final",20,shotclock_enjoyer3761,https://example.invalid/synthetic,2025-12-06 20:00:00 UTC,post_game_thread,men|2025-2026|G00027|men_LAKE_lakeshore-poly-ironmen|men_JUNI_juniper-ridge-a-m-timberwolves,men_LAKE_lakeshore-poly-ironmen|men_JUNI_juniper-ridge-a-m-timberwolves
+s_000008,CollegeBasketballSynthetic,"[Post Game Thread] Gulliford University defeats Windmere State, 87-70","Box Score
+
+Team | 1H | 2H | Final",36,courtside_analyst2084,https://example.invalid/synthetic,2025-12-07 19:30:00 UTC,post_game_thread,men|2025-2026|G00001|men_GULL_gulliford-university-sabers|men_WIND_windmere-state-ravens,men_GULL_gulliford-university-sabers|men_WIND_windmere-state-ravens
+s_000009,CollegeBasketballSynthetic,"[Post Game Thread] Dunmore defeats Gulliford University, 83-79","Box Score
+
+Team | 1H | 2H | Final",39,cornerthree_enjoyer1884,https://example.invalid/synthetic,2025-12-07 20:30:00 UTC,post_game_thread,men|2025-2026|G00007|men_DUNM_dunmore-foxes|men_GULL_gulliford-university-sabers,men_DUNM_dunmore-foxes|men_GULL_gulliford-university-sabers
+s_000010,CollegeBasketballSynthetic,"[Post Game Thread] Dunmore defeats Juniper Ridge A&M, 79-66","Box Score
+
+Team | 1H | 2H | Final",155,buckets_casual2377,https://example.invalid/synthetic,2025-12-08 23:30:00 UTC,post_game_thread,men|2025-2026|G00017|men_JUNI_juniper-ridge-a-m-timberwolves|men_DUNM_dunmore-foxes,men_JUNI_juniper-ridge-a-m-timberwolves|men_DUNM_dunmore-foxes
+s_000011,CollegeBasketballSynthetic,"[Post Game Thread] Gulliford University defeats Windmere State, 65-61","Box Score
+
+Team | 1H | 2H | Final",9,pickandroll_analyst8983,https://example.invalid/synthetic,2025-12-14 21:00:00 UTC,post_game_thread,men|2025-2026|G00013|men_WIND_windmere-state-ravens|men_GULL_gulliford-university-sabers,men_WIND_windmere-state-ravens|men_GULL_gulliford-university-sabers
+s_000012,CollegeBasketballSynthetic,"[Post Game Thread] Lakeshore Poly defeats Juniper Ridge A&M, 75-61","Box Score
+
+Team | 1H | 2H | Final",90,rimrun_truther7805,https://example.invalid/synthetic,2025-12-14 23:00:00 UTC,post_game_thread,men|2025-2026|G00010|men_JUNI_juniper-ridge-a-m-timberwolves|men_LAKE_lakeshore-poly-ironmen,men_JUNI_juniper-ridge-a-m-timberwolves|men_LAKE_lakeshore-poly-ironmen
+s_000013,CollegeBasketballSynthetic,"[Post Game Thread] Lakeshore Poly defeats Juniper Ridge A&M, 92-59","Box Score
+
+Team | 1H | 2H | Final",69,freethrow_lifer9613,https://example.invalid/synthetic,2025-12-15 19:00:00 UTC,post_game_thread,men|2025-2026|G00012|men_JUNI_juniper-ridge-a-m-timberwolves|men_LAKE_lakeshore-poly-ironmen,men_JUNI_juniper-ridge-a-m-timberwolves|men_LAKE_lakeshore-poly-ironmen
+s_000014,CollegeBasketballSynthetic,"[Post Game Thread] Lakeshore Poly defeats Juniper Ridge A&M, 75-67","Box Score
+
+Team | 1H | 2H | Final",261,freethrow_guy6138,https://example.invalid/synthetic,2025-12-18 22:00:00 UTC,post_game_thread,men|2025-2026|G00005|men_LAKE_lakeshore-poly-ironmen|men_JUNI_juniper-ridge-a-m-timberwolves,men_LAKE_lakeshore-poly-ironmen|men_JUNI_juniper-ridge-a-m-timberwolves
+s_000015,CollegeBasketballSynthetic,"[Post Game Thread] Lakeshore Poly defeats Juniper Ridge A&M, 81-70","Box Score
+
+Team | 1H | 2H | Final",17,swish_nerd5985,https://example.invalid/synthetic,2025-12-25 22:30:00 UTC,post_game_thread,men|2025-2026|G00002|men_LAKE_lakeshore-poly-ironmen|men_JUNI_juniper-ridge-a-m-timberwolves,men_LAKE_lakeshore-poly-ironmen|men_JUNI_juniper-ridge-a-m-timberwolves
+s_000016,CollegeBasketballSynthetic,"[Post Game Thread] Lakeshore Poly defeats Tidewater Tech, 88-65","Box Score
+
+Team | 1H | 2H | Final",22,screenassist_enjoyer5083,https://example.invalid/synthetic,2026-01-01 19:30:00 UTC,post_game_thread,men|2025-2026|G00018|men_TIDE_tidewater-tech-cyclones|men_LAKE_lakeshore-poly-ironmen,men_TIDE_tidewater-tech-cyclones|men_LAKE_lakeshore-poly-ironmen
+s_000017,CollegeBasketballSynthetic,"[Post Game Thread] Inglewood Bay College defeats Juniper Ridge A&M, 67-56","Box Score
+
+Team | 1H | 2H | Final",33,transitionD_nerd6128,https://example.invalid/synthetic,2026-01-03 00:00:00 UTC,post_game_thread,men|2025-2026|G00003|men_INGL_inglewood-bay-college-mariners|men_JUNI_juniper-ridge-a-m-timberwolves,men_INGL_inglewood-bay-college-mariners|men_JUNI_juniper-ridge-a-m-timberwolves
+s_000018,CollegeBasketballSynthetic,"[Post Game Thread] Lakeshore Poly defeats Juniper Ridge A&M, 88-62","Box Score
+
+Team | 1H | 2H | Final",80,tipoff_casual2459,https://example.invalid/synthetic,2026-01-04 00:00:00 UTC,post_game_thread,men|2025-2026|G00016|men_LAKE_lakeshore-poly-ironmen|men_JUNI_juniper-ridge-a-m-timberwolves,men_LAKE_lakeshore-poly-ironmen|men_JUNI_juniper-ridge-a-m-timberwolves
+s_000019,CollegeBasketballSynthetic,"[Post Game Thread] Gulliford University defeats Windmere State, 74-56","Box Score
+
+Team | 1H | 2H | Final",46,buckets_sicko763,https://example.invalid/synthetic,2026-01-20 22:30:00 UTC,post_game_thread,men|2025-2026|G00004|men_WIND_windmere-state-ravens|men_GULL_gulliford-university-sabers,men_WIND_windmere-state-ravens|men_GULL_gulliford-university-sabers
+s_000020,CollegeBasketballSynthetic,"[Post Game Thread] Lakeshore Poly defeats Juniper Ridge A&M, 74-71","Box Score
+
+Team | 1H | 2H | Final",35,buckets_enjoyer3842,https://example.invalid/synthetic,2026-01-21 21:00:00 UTC,post_game_thread,men|2025-2026|G00008|men_JUNI_juniper-ridge-a-m-timberwolves|men_LAKE_lakeshore-poly-ironmen,men_JUNI_juniper-ridge-a-m-timberwolves|men_LAKE_lakeshore-poly-ironmen
+s_000021,CollegeBasketballSynthetic,"[Post Game Thread] Gulliford University defeats Marbury State, 92-76","Box Score
+
+Team | 1H | 2H | Final",23,midrange_watcher7912,https://example.invalid/synthetic,2026-01-21 22:00:00 UTC,post_game_thread,men|2025-2026|G00000|men_MARB_marbury-state-comets|men_GULL_gulliford-university-sabers,men_MARB_marbury-state-comets|men_GULL_gulliford-university-sabers
+s_000022,CollegeBasketballSynthetic,"[Post Game Thread] Gulliford University defeats Windmere State, 70-55","Box Score
+
+Team | 1H | 2H | Final",31,crossover_guy3376,https://example.invalid/synthetic,2026-02-17 23:00:00 UTC,post_game_thread,men|2025-2026|G00006|men_WIND_windmere-state-ravens|men_GULL_gulliford-university-sabers,men_WIND_windmere-state-ravens|men_GULL_gulliford-university-sabers
+s_000023,CollegeBasketballSynthetic,"[Post Game Thread] Juniper Ridge A&M defeats Lakeshore Poly, 78-62","Box Score
+
+Team | 1H | 2H | Final",69,glasscleaner_sicko484,https://example.invalid/synthetic,2026-02-24 23:00:00 UTC,post_game_thread,men|2025-2026|G00021|men_JUNI_juniper-ridge-a-m-timberwolves|men_LAKE_lakeshore-poly-ironmen,men_JUNI_juniper-ridge-a-m-timberwolves|men_LAKE_lakeshore-poly-ironmen
+s_000024,CollegeBasketballSynthetic,"[Post Game Thread] Juniper Ridge A&M defeats Gulliford University, 79-76","Box Score
+
+Team | 1H | 2H | Final",1731,freethrow_fan9576,https://example.invalid/synthetic,2026-02-27 19:30:00 UTC,post_game_thread,men|2025-2026|G00011|men_JUNI_juniper-ridge-a-m-timberwolves|men_GULL_gulliford-university-sabers,men_JUNI_juniper-ridge-a-m-timberwolves|men_GULL_gulliford-university-sabers
+s_000025,CollegeBasketballSynthetic,"[Post Game Thread] Juniper Ridge A&M defeats Lakeshore Poly, 74-72","Box Score
+
+Team | 1H | 2H | Final",38,shotclock_sicko5262,https://example.invalid/synthetic,2026-03-02 23:30:00 UTC,post_game_thread,men|2025-2026|G00023|men_JUNI_juniper-ridge-a-m-timberwolves|men_LAKE_lakeshore-poly-ironmen,men_JUNI_juniper-ridge-a-m-timberwolves|men_LAKE_lakeshore-poly-ironmen
+s_000026,CollegeBasketballSynthetic,"[Post Game Thread] Lakeshore Poly defeats Juniper Ridge A&M, 74-66","Box Score
+
+Team | 1H | 2H | Final",411,courtside_fan6460,https://example.invalid/synthetic,2026-03-04 20:00:00 UTC,post_game_thread,men|2025-2026|G00024|men_JUNI_juniper-ridge-a-m-timberwolves|men_LAKE_lakeshore-poly-ironmen,men_JUNI_juniper-ridge-a-m-timberwolves|men_LAKE_lakeshore-poly-ironmen
+s_000027,CollegeBasketballSynthetic,"[Post Game Thread] Dunmore defeats Gulliford University, 70-63","Box Score
+
+Team | 1H | 2H | Final",81,swish_hater8945,https://example.invalid/synthetic,2026-03-14 23:00:00 UTC,post_game_thread,men|2025-2026|G00015|men_GULL_gulliford-university-sabers|men_DUNM_dunmore-foxes,men_GULL_gulliford-university-sabers|men_DUNM_dunmore-foxes
+s_000028,CollegeBasketballSynthetic,Rank the Atlantic Ridge starting fives,,2,hardwood_casual6332,https://example.invalid/synthetic,2025-11-15 07:19:48 UTC,discussion,,men_DUNM_dunmore-foxes|men_GULL_gulliford-university-sabers
+s_000029,CollegeBasketballSynthetic,Rank the Atlantic Ridge starting fives,,2,hardwood_casual6332,https://example.invalid/synthetic,2025-11-18 18:04:21 UTC,discussion,,men_WIND_windmere-state-ravens|men_DUNM_dunmore-foxes|men_GULL_gulliford-university-sabers
+s_000030,CollegeBasketballSynthetic,Rank the Coastal Eight starting fives,,5,courtside_fan6460,https://example.invalid/synthetic,2026-02-20 12:43:02 UTC,discussion,,men_JUNI_juniper-ridge-a-m-timberwolves|men_LAKE_lakeshore-poly-ironmen
+s_000031,CollegeBasketballSynthetic,Weekly Great Plains discussion thread,,19,buckets_casual2377,https://example.invalid/synthetic,2025-12-13 05:51:58 UTC,discussion,,men_TIDE_tidewater-tech-cyclones|men_INGL_inglewood-bay-college-mariners|men_MARB_marbury-state-comets
+s_000032,CollegeBasketballSynthetic,Weekly Atlantic Ridge discussion thread,,73,shotclock_sicko5262,https://example.invalid/synthetic,2025-12-05 00:18:41 UTC,discussion,,men_DUNM_dunmore-foxes|men_WIND_windmere-state-ravens|men_GULL_gulliford-university-sabers
+s_000033,CollegeBasketballSynthetic,Is Atlantic Ridge the worst it has been in a decade?,,1,pickandroll_analyst8983,https://example.invalid/synthetic,2026-01-15 13:29:05 UTC,discussion,,men_DUNM_dunmore-foxes|men_GULL_gulliford-university-sabers|men_WIND_windmere-state-ravens
+s_000034,CollegeBasketballSynthetic,Transfer portal speculation - Great Plains,,43,screenassist_fan2524,https://example.invalid/synthetic,2026-03-12 02:27:09 UTC,discussion,,men_TIDE_tidewater-tech-cyclones|men_INGL_inglewood-bay-college-mariners|men_MARB_marbury-state-comets
+s_000035,CollegeBasketballSynthetic,Which Atlantic Ridge team is most likely to collapse down the stretch?,,36,pickandroll_enjoyer4126,https://example.invalid/synthetic,2025-11-20 09:19:56 UTC,discussion,,men_DUNM_dunmore-foxes|men_GULL_gulliford-university-sabers|men_WIND_windmere-state-ravens
+s_000036,CollegeBasketballSynthetic,Which Great Plains team is most likely to collapse down the stretch?,,34,buckets_enjoyer3842,https://example.invalid/synthetic,2025-12-26 17:51:21 UTC,discussion,,men_MARB_marbury-state-comets|men_INGL_inglewood-bay-college-mariners|men_TIDE_tidewater-tech-cyclones
+s_000037,CollegeBasketballSynthetic,Unpopular opinion thread: Coastal Eight edition,,19,hardwood_casual6332,https://example.invalid/synthetic,2025-11-29 03:31:32 UTC,discussion,,men_LAKE_lakeshore-poly-ironmen|men_JUNI_juniper-ridge-a-m-timberwolves
+s_000038,CollegeBasketballSynthetic,Transfer portal speculation - Great Plains,,21,hardwood_watcher8199,https://example.invalid/synthetic,2026-01-31 19:40:46 UTC,discussion,,men_MARB_marbury-state-comets|men_INGL_inglewood-bay-college-mariners
+s_000039,CollegeBasketballSynthetic,Is Atlantic Ridge the worst it has been in a decade?,,10,boxout_casual9671,https://example.invalid/synthetic,2026-02-02 09:43:39 UTC,discussion,,men_GULL_gulliford-university-sabers|men_DUNM_dunmore-foxes|men_WIND_windmere-state-ravens
+s_000040,CollegeBasketballSynthetic,Unpopular opinion thread: Great Plains edition,,4,cornerthree_guy2872,https://example.invalid/synthetic,2025-11-22 01:39:10 UTC,discussion,,men_TIDE_tidewater-tech-cyclones|men_MARB_marbury-state-comets|men_INGL_inglewood-bay-college-mariners
+s_000041,CollegeBasketballSynthetic,Which Great Plains team is most likely to collapse down the stretch?,,16,shotclock_poster6231,https://example.invalid/synthetic,2025-12-17 06:41:28 UTC,discussion,,men_INGL_inglewood-bay-college-mariners|men_TIDE_tidewater-tech-cyclones|men_MARB_marbury-state-comets
+s_000042,CollegeBasketballSynthetic,Transfer portal speculation - Atlantic Ridge,,16,rimrun_hype3144,https://example.invalid/synthetic,2026-01-07 05:44:40 UTC,discussion,,men_WIND_windmere-state-ravens|men_GULL_gulliford-university-sabers|men_DUNM_dunmore-foxes
