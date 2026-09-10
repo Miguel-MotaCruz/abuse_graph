@@ -26,14 +26,34 @@ copied from the real corpus.
 
 ## Setup
 
-You need Python 3.10 or newer.
+This project uses **uv**, which installs Python and every dependency for you.
+You do not need to know what a virtual environment is yet.
+
+Install uv once (macOS / Linux):
 
 ```bash
-python -m pip install -r requirements.txt
-python load_data.py
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+On Windows, in PowerShell:
+
+```powershell
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+Then, in this folder:
+
+```bash
+uv sync            # installs Python 3.13 and the four packages. Once.
+uv run python load_data.py
 ```
 
 If that prints a list of tables and three rows of data, you are ready.
+
+**From now on, put `uv run` in front of every python command.** That is the
+whole trick: `uv run python build_graph.py`, not `python build_graph.py`. It
+guarantees you are using this project's packages and not something else on your
+machine.
 
 ---
 
@@ -80,84 +100,107 @@ of edge.
 
 ---
 
-## What to do, in order
+## This week
 
-Take your time. This is four to six weeks of work if you are learning Python
-alongside it, and that is fine.
+About **6 hours** if you can already write a Python loop, **11** if you cannot.
+Do them in this order. If you run out of time, stop where you are and tell me
+where that was — that is useful information, not a failure.
 
-### Step 1 — Python, if you need it
+### 1. Set up and check it works — 15 min
 
-If you are not comfortable with lists, dictionaries, loops and functions, do
-this first and do not skip it:
+`uv sync`, then `uv run python load_data.py`. If it prints tables, you are done.
 
-- **Python for Everybody**, Dr. Charles Severance — <https://www.py4e.com>
-  Free videos and a free book, written for people who are not programmers.
-  Chapters 1–10. This is the best free Python course for a beginner, and it is
-  not close.
+### 2. Explore the finished graph — 30 min
 
-Then, for the data handling:
+Open `interactive/toy.html` (double-click it). **Do the seven-step guided tour
+in the sidebar, in order.** Each step asks a question. Write your answer down
+*before* clicking next. Then open `interactive/small.html` and notice what
+changed.
 
-- **Corey Schafer's pandas series** on YouTube — search "Corey Schafer pandas".
-  The first five videos are enough. `pandas` is how you will touch every file
-  in `data/`.
+This is the most valuable 30 minutes of the week. Do not skip it.
 
-### Step 2 — see the thing before you build it
+### 3. Read — 1.5 hours
+
+- the rest of this README, properly
+- `TUTORIAL_GRAPHS.md` **sections 0 to 4 only** (setup, what a graph is, our
+  graph, degree, paths and components). Do the exercises as you go.
+- `SCHEMA.md` — skim it, so you know what columns exist. Come back to it
+  constantly.
+
+Stop at section 5. Centrality and communities are next week.
+
+### 4. Python, only if you need it — 5 hours
+
+If you cannot comfortably write a `for` loop over a list, or use a dictionary,
+do this before step 5:
+
+- **Kaggle "Python"** — <https://www.kaggle.com/learn/python> — 7 short lessons,
+  about 5 hours, free, runs in your browser with nothing to install.
+
+That is the fastest honest route from zero to enough. If you already know this,
+skip it.
+
+### 5. The NetworkX tutorial — 45 min
+
+<https://networkx.org/documentation/stable/tutorial.html>
+
+Read it with `uv run python` open in another window and type the examples in.
+Reading it without typing is worth about a quarter as much.
+
+### 6. Build the graph — 2 hours
 
 ```bash
-open interactive/toy.html      # or just double-click it
+uv run python build_graph.py
 ```
 
-**Do the seven-step guided tour** in the sidebar, in order, and answer the
-question each step asks *before* clicking to the next one. Write the answers
-down. Some are harder than they look.
+Read the output, then read the file, then do **TODOs 1 and 2** at the bottom.
+(3, 4 and 5 are for next week.)
 
-Then do the same with `interactive/small.html` and notice what changed.
-
-### Step 3 — read
-
-`TUTORIAL_GRAPHS.md`, sections 1 to 4. Do the exercises; the answers are
-deliberately not in the file. Then read Phase 1 in `ROADMAP.md`, and skim
-`SCHEMA.md` so you know what columns exist.
-
-### Step 4 — build it
-
-```bash
-python build_graph.py
-```
-
-Read the output, then read the code, then do the TODOs at the bottom. You are
-building the whole `toy` graph.
-
-**Before you run your finished version, write down your prediction for how many
+**Before running your finished version, write down your prediction for how many
 nodes and how many edges it will have.** If you are wrong, work out why before
-you change anything.
+changing anything. Bring your prediction and the real number to our next
+meeting.
 
-### Step 5 — draw it
+### 7. Draw it — 1.5 hours
 
 ```bash
-python plot_graph.py
+uv run python plot_graph.py
 ```
 
-Same deal: read, then do the TODOs. Compare what you get with
+Same deal: read, then do **TODOs 1, 2 and 3**. Compare with
 `reference/toy_graph_reference.png`. It will not be laid out identically — the
 layout is random — but it should have the same shape and the same counts.
 
-### Step 6 — measure it
+### Bring to the next meeting
 
-`TUTORIAL_GRAPHS.md` sections 5 to 8: degree, centrality, why the clustering
-coefficient here is exactly zero, projection, and communities.
-
-By the end you should be able to answer, from the data and without being told:
-
-- Who are the most active users? Are they the most abusive ones?
-- Who gets targeted most? Are they the most abused?
-- Do the users fall into groups? What is each group organised around?
-- Is there anyone who does not fit any group?
-
-Write your answers down **before** you ask your supervisor for the answer key.
-It exists, and asking for it early wastes the exercise.
+1. Your seven answers from the tour.
+2. Your node/edge prediction, and the real number.
+3. Your version of `build_graph.py` and `plot_graph.py`.
+4. Your PNG of the whole toy graph.
+5. **A list of things that surprised you.** Written down before you explained
+   them away. This is the item I care about most.
 
 ---
+
+## After this week
+
+Not now. Here so you can see where it goes.
+
+- `TUTORIAL_GRAPHS.md` §5–8: centrality, why the clustering coefficient here is
+  exactly zero, projection, and communities. The rest of the TODOs in both
+  scripts.
+- Then the four questions the whole first phase is aiming at:
+  - Who are the most active users? Are they the most abusive ones?
+  - Who gets targeted most? Are they the most abused?
+  - Do the users fall into groups? What is each group organised around?
+  - Is there anyone who does not fit any group?
+- **Background reading, at your own pace, not this week:**
+  [*Network Science*](http://networksciencebook.com) by Barabási, chapters 1–2.
+  Free, online, well illustrated. About 3 hours. The best single thing to read
+  on networks, but it is not urgent.
+
+There is an answer key for the questions above. Write your answers down before
+you ask for it, or you waste the exercise.
 
 ## Things that will save you time
 

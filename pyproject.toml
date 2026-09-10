@@ -1,0 +1,22 @@
+[project]
+name = "abuse-graph-starter"
+version = "0.1.0"
+description = "Starting point for a graph-based study of abusive behaviour in sports discussion"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "pandas>=2.0",
+    "numpy>=1.24",
+    "networkx>=3.1",
+    "matplotlib>=3.7",
+]
+
+[dependency-groups]
+# `uv sync` installs these too. Handy but not required.
+dev = [
+    "ipykernel>=6.29",   # so you can use a notebook if you prefer one
+    "jupyter>=1.0",
+]
+
+[tool.uv]
+package = false          # this is a project to run, not a library to install

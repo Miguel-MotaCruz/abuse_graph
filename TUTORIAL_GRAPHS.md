@@ -1,23 +1,29 @@
 # Graphs, from scratch, using this project's data
 
 For someone who has not written much code and has never met a graph. Work
-through it in order. Every code block runs against `toy`, which is 130
-comments and small enough to print in full.
+through it in order. Every code block runs against `toy`, which is 130 comments
+and small enough to print in full.
 
-You will need about four sessions of two hours. Do not read ahead; do the
-exercises. The answers to most of them are *not* in this file, on purpose.
+**Sections 0–4 are your first week** — about 1.5 hours of reading plus the
+exercises. Stop at §5; centrality and communities come after you have built the
+graph yourself.
 
-**External resources are at the end.** Read §11 before you start §1 if you
-prefer video and lectures to reading.
+Do not read ahead. Do the exercises. The answers to most of them are *not* in
+this file, on purpose.
+
+External resources are in §11, with honest time estimates.
 
 ---
 
 ## 0. Setup
 
 ```bash
-python -m pip install -r requirements.txt
-python -c "import networkx; print(networkx.__version__)"
+uv sync
+uv run python -c "import networkx; print(networkx.__version__)"
 ```
+
+Every command in this file assumes `uv run` in front of it. For interactive
+work, `uv run python` gives you a REPL with everything already importable.
 
 ```python
 from load_data import load
@@ -458,60 +464,53 @@ Two ideas worth meeting early because they will save you from a wrong result:
 
 ---
 
-## 11. The best free resources
+## 11. Free resources, with honest time estimates
 
-Ranked for someone in your position. You do not need all of them.
+The times are what it actually takes, not what the marketing says. Only the
+first two are for your first week.
 
-### Start here
+### Now, if you need them
 
-**Network Science — Albert-László Barabási.** <http://networksciencebook.com>
-The whole book, free, online, beautifully illustrated. Chapters 1–4 (graph
-theory, random networks, the scale-free property, the Barabási–Albert model) are
-exactly your foundation and assume very little maths. This is the single best
-free resource on this list; if you read one thing, read this.
+| | time | what it is |
+|---|---|---|
+| **Kaggle "Python"** — <https://www.kaggle.com/learn/python> | ~5 h | 7 short lessons, runs in your browser, nothing to install. The fastest honest route from zero to writing loops and functions. Skip it if you can already do that. |
+| **NetworkX tutorial** — <https://networkx.org/documentation/stable/tutorial.html> | ~45 min | The official walkthrough of the library you are using. Type the examples in; reading it passively is worth a quarter as much. |
 
-**NetworkX tutorial.** <https://networkx.org/documentation/stable/tutorial.html>
-Half an hour. The official walkthrough of the library you are using. Do it with
-a REPL open.
+### Soon, at your own pace
 
-### Lectures, if you prefer watching
+| | time | what it is |
+|---|---|---|
+| **Kaggle "Pandas"** — <https://www.kaggle.com/learn/pandas> | ~4 h | Same format. `pandas` is how you touch every file in `data/`. Do this once the graph code starts feeling like the easy part. |
+| **Network Science**, Barabási — <http://networksciencebook.com> | ~3 h for ch. 1–2 | The whole book, free, online, beautifully illustrated. Chapters 1 and 2 are your foundation and assume very little maths. The best single thing to read on networks. Chapters 3–4 (scale-free networks) when you get to degree distributions. |
+| **Corey Schafer's pandas videos** on YouTube | ~2 h for the first 5 | If you would rather watch than click through Kaggle. Same material. |
 
-**Stanford CS224W — Machine Learning with Graphs** (Jure Leskovec). Lecture
-videos free on YouTube, slides at <https://web.stanford.edu/class/cs224w/>.
-Lectures 1–3 cover graph fundamentals and node features; the later half is
-graph neural networks, which is Phase 10 territory — do not start there.
+### Later, when a specific problem sends you there
 
-**Networks, Crowds, and Markets — Easley & Kleinberg.**
-<https://www.cs.cornell.edu/home/kleinber/networks-book/>
-Free PDF. Strong on the *social science* of networks — homophily, strong and
-weak ties, community structure — with almost no linear algebra. Chapters 1–5.
+- **Networks, Crowds, and Markets** — Easley & Kleinberg,
+  <https://www.cs.cornell.edu/home/kleinber/networks-book/>. Free PDF. Strong on
+  the *social science* of networks — homophily, weak ties, community structure —
+  with almost no linear algebra. Chapters 1–5, a few hours each. Read it when
+  you start asking what a community *means*.
+- **Traag, Waltman & van Eck (2019), "From Louvain to Leiden"** —
+  <https://www.nature.com/articles/s41598-019-41695-z>. ~30 min. Short and
+  readable, and the reason not to default to Louvain.
+- **Mark Newman, "Networks: An Introduction"**. Not free. The clearest treatment
+  of centrality and community detection anywhere. Find a library copy when §8
+  becomes real work.
+- **Latapy, Magnien & Del Vecchio (2008)** on bipartite metrics — when §6
+  becomes a problem you actually have.
+- **D3 force-directed example** —
+  <https://observablehq.com/@d3/force-directed-graph>. 15 minutes of dragging
+  nodes around builds better intuition for what a layout *is* than an hour of
+  reading.
 
-### Reference, for when you need the details
+### Do not start here
 
-**Mark Newman, "Networks: An Introduction".** The standard textbook. Not free,
-but the chapters on centrality and community detection are the clearest
-treatment anywhere. Worth finding a library copy when you start §8 seriously.
-
-**Traag, Waltman & van Eck (2019), "From Louvain to Leiden".**
-<https://www.nature.com/articles/s41598-019-41695-z> — short, readable, and the
-reason you should not default to Louvain.
-
-**Latapy, Magnien & Del Vecchio (2008)**, on bipartite network metrics — read it
-when §6 becomes a problem you actually have.
-
-### Play
-
-**D3 force-directed examples** — <https://observablehq.com/@d3/force-directed-graph>
-Drag nodes around and watch the layout respond. Fifteen minutes of this builds
-better intuition for what a layout *is* than any amount of reading.
-
-### Skip for now
-
-Anything titled "graph neural networks", "node2vec", or "graph embeddings". They
-are Phases 9–10 and they will make more sense once you have a question that
-simpler methods cannot answer.
-
----
+Anything titled "graph neural networks", "node2vec", or "graph embeddings", and
+the second half of Stanford's CS224W. They are the last phase of this project
+and they will make more sense once you have a question that simpler methods
+cannot answer. (CS224W lectures 1–3 are good on fundamentals if you like
+lectures — but stop there.)
 
 ## Checklist
 
