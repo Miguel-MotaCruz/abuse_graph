@@ -204,46 +204,77 @@ they cut off from the rest? (This is not a bug in the data.)
 
 ## 5. Centrality: five answers to "who matters?"
 
-Centrality is any attempt to score nodes by importance. There are many because
-"important" means different things. Compute them:
+Centrality is any attempt to score nodes by importance. There are several
+because "important" means different things.
+
+You compute all of them with one line each. `G` is the graph you built in
+`build_graph.py`; `U` is the same graph with the directions removed, which some
+of these need.
 
 ```python
-from metrics import node_metrics, metric_notes
-m = node_metrics(G)
-print(m[m.kind == 'user'].nlargest(8, 'degree')
-      [['label','degree','interactions','abusive_out','abuse_rate',
-        'betweenness','closeness','pagerank']].to_string())
+import networkx as nx
+import pandas as pd
+
+U = G.to_undirected()
+
+m = pd.DataFrame({
+    "kind":        pd.Series(dict(G.nodes(data="kind"))),
+    "label":       pd.Series(dict(G.nodes(data="label"))),
+    "out_degree":  pd.Series(dict(G.out_degree())),
+    "in_degree":   pd.Series(dict(G.in_degree())),
+    "degree":      pd.Series(dict(U.degree())),
+    "betweenness": pd.Series(nx.betweenness_centrality(U)),
+    "closeness":   pd.Series(nx.closeness_centrality(U)),
+    "eigenvector": pd.Series(nx.eigenvector_centrality(U, max_iter=1000)),
+    "pagerank":    pd.Series(nx.pagerank(G)),
+    "clustering":  pd.Series(nx.clustering(U)),
+})
+
+print(m[m.kind == "user"].nlargest(8, "degree").to_string())
 ```
 
-- **Degree** — how many connections. Cheap, and usually the first thing you
-  should look at.
-- **Betweenness** — what share of all shortest paths run through you. High
-  betweenness means you are a bridge: remove the node and parts of the graph
-  fall away from each other. Expensive to compute (roughly nodes × edges).
-- **Closeness** — how near you are to everyone else on average.
-- **Eigenvector centrality** — you are important if your neighbours are
-  important. Defined recursively; solved as an eigenvector problem.
-- **PageRank** — a random walker following edges, restarting occasionally. Where
-  does it spend its time?
+The vocabulary, which you will hear constantly:
 
-Now the important part. Run this:
+- **Degree** — how many edges touch a node. The cheapest measure of importance
+  and usually the first thing to look at. Split into **in-degree** (edges
+  arriving) and **out-degree** (edges leaving) when the graph is directed.
+- **Weighted degree**, also called **strength** — the same thing but summing
+  edge weights instead of counting edges. Ours are unweighted, so strength
+  equals degree until you aggregate in §7.
+- **Betweenness centrality** — what share of all shortest paths in the graph run
+  through this node. High betweenness means you are a **bridge**: delete the
+  node and parts of the graph fall away from each other. Expensive: roughly
+  (nodes × edges), so it is the first thing that becomes unaffordable at scale.
+- **Closeness centrality** — the inverse of your average distance to everyone
+  else. "How near am I to the whole graph?"
+- **Eigenvector centrality** — you are important if your neighbours are
+  important. Defined circularly and solved as an eigenvector problem, which is
+  where the name comes from.
+- **PageRank** — imagine a walker following edges at random, occasionally
+  teleporting to a random node. PageRank is where it spends its time. This is
+  the algorithm Google was built on.
+- **Clustering coefficient** — of all the pairs of my neighbours, how many are
+  connected to each other? "Do my friends know each other?" See §6.
+
+Now the part that matters more than any of the definitions. Run this:
 
 ```python
-print(m[m.kind=='user'].pagerank.describe())
-print(m[m.kind=='comment'].in_degree.unique())
+print(m[m.kind == "user"].pagerank.describe())
+print(m[m.kind == "comment"].in_degree.unique())
 print(m.clustering.unique())
 ```
 
-Three of the numbers you just computed are degenerate on this graph:
+**Three of the numbers you just computed are meaningless on this graph:**
 
-- **User PageRank is constant.** Users are pure sources in a directed
-  user→comment→target graph, so they receive nothing but the restart mass.
-  Ranking users by PageRank ranks the damping factor.
+- **User PageRank is constant.** Users are pure *sources* in a directed
+  user→comment→target graph — nothing ever points at them — so they receive
+  only the teleport mass. Ranking users by PageRank ranks the damping factor.
 - **Comment in-degree is always 1.** Every comment has exactly one author.
-- **Clustering coefficient is exactly 0 for every node.** See §6.
+- **Clustering is exactly 0 for every node**, and it is forced by the shape of
+  the graph rather than being a fact about the data. §6.
 
-`metric_notes()` gives, for each metric, what it measures, which node types it
-applies to, whether it is valid here, and its limitations. Read it.
+A metric being *computable* is not the same as it being *informative*. Getting
+this distinction is most of the skill.
 
 **Exercise 5.1.** Rank users by degree, then by betweenness. The orders differ.
 Pick one user who moves a lot and explain, from the graph, why.
@@ -286,48 +317,80 @@ bipartite graph, and say what you would use instead.
 ## 7. Projection: making a graph smaller, and what it costs
 
 Our graph has 130 comment nodes and 15 users. If the question is "who targets
-whom", the comments are in the way. So aggregate:
+whom", the comments are in the way. So **aggregate** them out:
 
 ```python
-from graph import build_graph
-from graphs import build_user_target      # user -> target, weighted
-H = build_user_target(d)
-print(H.number_of_nodes(), H.number_of_edges())
+import collections
+
+H = nx.DiGraph()                     # the projected graph
+counts = collections.Counter()       # (user, target) -> how many times
+abusive = collections.Counter()      # (user, target) -> how many were abusive
+
+for user in [n for n, k in G.nodes(data="kind") if k == "user"]:
+    for _, comment in G.out_edges(user):
+        for _, target, edge in G.out_edges(comment, data=True):
+            counts[(user, target)] += 1
+            abusive[(user, target)] += (edge["is_abusive"] == "YES")
+
+for (user, target), n in counts.items():
+    H.add_edge(user, target,
+               weight=n,
+               interaction_count=n,
+               abusive_count=abusive[(user, target)],
+               abuse_rate=abusive[(user, target)] / n)
+
+print(G.number_of_nodes(), "->", H.number_of_nodes(), "nodes")
+print(G.number_of_edges(), "->", H.number_of_edges(), "edges")
 print(list(H.edges(data=True))[0])
 ```
 
-Each edge now carries `interaction_count`, `abusive_count`, `abuse_rate`,
-`first_interaction`, `last_interaction`. This is a **projection**: a smaller
-graph derived from a bigger one.
+This is a **projection**: a smaller graph derived from a bigger one. Notice the
+edges are now **weighted** — that is what aggregation buys you, and it is why
+"weighted degree" finally means something different from "degree".
 
 **What you lost.** Which comment. Whether two targets were named in the *same*
 comment. The order of events within a pair. Ten interactions in one night now
-look much like ten spread over four months (partly recoverable from
-first/last, not fully).
+look like ten spread over four months — unless you also carry the first and
+last timestamp, which is why real pipelines do.
 
-Do the collapse by hand once, for one user, and check you get the same numbers.
+Do the collapse by hand for one user, on paper, and check you get the same
+numbers.
 
 ### The dangerous projection
 
 A **user–user** projection connects two users if they share a target. It sounds
 harmless and it is not: a single target mentioned by `k` users creates
-`k(k-1)/2` edges. One popular player wires half the graph into a clique, and
-any community you then detect is partly "people who talked about that player".
+`k(k-1)/2` edges. One popular player wires half the graph into a **clique** (a
+set of nodes where everyone is connected to everyone), and any community you
+then detect is partly "people who talked about that player".
 
 ```python
-from graphs import build_user_projection
-P1 = build_user_projection(d, weight='count')     # naive
-P2 = build_user_projection(d, weight='newman')    # degree-discounted
-print(P1.number_of_edges(), P2.number_of_edges())     # same edges...
-print(sorted((e['weight'] for *_ , e in P1.edges(data=True)), reverse=True)[:5])
-print(sorted((e['weight'] for *_ , e in P2.edges(data=True)), reverse=True)[:5])
+import itertools
+
+users_of = collections.defaultdict(set)
+for user, target in H.edges():
+    users_of[target].add(user)
+
+naive = collections.Counter()      # how many targets do these two share?
+newman = collections.Counter()     # ... discounted by how popular each target is
+for target, users in users_of.items():
+    k = len(users)
+    if k < 2:
+        continue
+    for a, b in itertools.combinations(sorted(users), 2):
+        naive[(a, b)] += 1
+        newman[(a, b)] += 1 / (k - 1)
+
+print(len(naive), "user-user edges from", H.number_of_nodes(), "nodes")
+print("heaviest naive :", naive.most_common(3))
+print("heaviest newman:", sorted(newman.items(), key=lambda kv: -kv[1])[:3])
 ```
 
-Same edges, different **weights**. The Newman (2001) discount gives each shared
-target `t` a weight of `1/(deg(t) - 1)`, so a target everybody mentions
+Same edges, different **weights**. The **Newman (2001)** discount gives each
+shared target a weight of `1/(deg(t) - 1)`, so a target everybody mentions
 contributes almost nothing and a target two people share contributes a lot.
 Community detection optimises over weights, so these two graphs can give
-different answers while looking identical in any node/edge count.
+different answers while being identical in any node or edge count.
 
 **Exercise 7.1.** At `large` the naive projection has over a million
 edges against 28,000 for user→target. Predict which one takes longer to run
