@@ -20,7 +20,7 @@ from load_data import load
 # Keep these consistent everywhere. A reader should learn the key once.
 STYLE = {
     "user":    {"colour": "#2f6fdb", "shape": "o", "size": 700},
-    "comment": {"colour": "#c9ccd1", "shape": "s", "size": 120},
+    "comment": {"colour": "#c9ccd1a6", "shape": "s", "size": 50},
     "player":  {"colour": "#e08b2a", "shape": "^", "size": 600},
     "team":    {"colour": "#2e9e6b", "shape": "D", "size": 600},
 }
@@ -47,7 +47,7 @@ def draw(G, path="my_graph.png", title="my graph"):
     #    to every node. `spring_layout` pretends edges are springs and lets the
     #    whole thing settle. `seed` fixes the randomness so you get the same
     #    picture twice.
-    pos = nx.spring_layout(G.to_undirected(), seed=7)
+    pos = nx.kamada_kawai_layout(G.to_undirected())
 
     fig, ax = plt.subplots(figsize=(9, 7))
 
@@ -76,7 +76,10 @@ def draw(G, path="my_graph.png", title="my graph"):
 
     # 4. LABELS. Readable at this size; at 200 nodes they turn into a smear and
     #    you will want to label only the interesting ones.
-    labels = {n: a for n, a in G.nodes(data="label")}
+    labels = {}
+    for n, data in G.nodes(data=True):
+        if data.get("kind") in {"user", "player"}:
+            labels[n] = data.get("label")
     nx.draw_networkx_labels(G, pos, ax=ax, labels=labels, font_size=8)
 
     # 5. A LEGEND. A figure nobody can decode is not a figure.
@@ -104,6 +107,23 @@ if __name__ == "__main__":
     draw(G, "my_graph.png", "three rows of the toy dataset")
 
 
+
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+import networkx as nx
+
+from load_data import load
+from build_graph import build
+if __name__ == "__main__":
+    d = load("toy")
+    G = build(d)
+
+    print(G.number_of_nodes(), "nodes,", G.number_of_edges(), "edges")
+    draw(G, "my_graph.png", "whole toy dataset")
+
+
 # ===========================================================================
 # TODO -- your turn
 # ===========================================================================
@@ -116,13 +136,27 @@ if __name__ == "__main__":
 #
 # 3. Turn the labels off for comments (keep them for users and players). Look
 #    at `reference/toy_graph_reference.png` -- which labels did it keep?
+# 
+# it only kept labels for users
 #
 # 4. Try `nx.spring_layout(..., k=0.3)` and `k=2.0` and see what `k` does.
 #    Then try `nx.kamada_kawai_layout`. Which is easier to read, and why?
 #
+# kawai layout is the easiest to read because the data is spread out and the nodes are easier to read.
+# it groups the nodes in a more organized way, while the spring layout is more chaotic and harder to read.
+#
 # 5. Save a version with only the abusive edges drawn. What can you see that
 #    you could not see before? What did you lose?
+#
+abusive_only = G.copy()
+abusive_only.remove_edges_from([(u, v) for u, v, e in G.edges(data=True) if e.get("is_abusive") != "YES" ])
+draw(abusive_only, "my_graph_abusive_only.png", "toy dataset, abusive edges only")
+# this graph is so ugly. i lost the organization of the graph and the context of the edges. 
+# i can see which users are targeting which players, but i can't see the relationships between the comments and the users. 
+# it is hard to see the overall structure of the graph without the other edges.
 #
 # 6. Open interactive/toy.html and do the seven-step tour. Several of the
 #    things you just built by hand are switches in there. Which of your five
 #    plots above does step 2 of the tour replace?
+# step 2 replaces the plot with only the abusive edges drawn.
+#
