@@ -130,15 +130,7 @@ def build(d):
 #    happen to be players, but in `small` there are teams too. Set `kind` from
 #    `entity_type` rather than hard-coding "player".
 #  
-def build(d):
-    G4 = nx.DiGraph()
-    for row in d["interactions"].itertuples(index=False):
-        G4.add_node(row.author_id, kind="user", label=row.author_username)
-        G4.add_node(row.comment_id, kind="comment")
-        G4.add_node(row.target_id, kind=row.entity_type, label=row.entity_text)
-        G4.add_edge(row.author_id, row.comment_id, kind="authored")
-        G4.add_edge(row.comment_id, row.target_id, kind="targets", is_abusive=row.is_abusive)
-    return G4
+#
 #
 # 4. In `small` and beyond, some rows have an EMPTY `target_id`: the annotator
 #    could not work out who was meant. Decide what to do with those rows and
@@ -152,3 +144,15 @@ def build(d):
 # Check yourself: `reference/toy_graph_reference.png` is what the finished
 # `toy` graph looks like. Yours will not be laid out identically -- the layout
 # is random -- but it should have the same shape and the same counts.
+#
+# NEW VERSION OF GRAPH FOR TOY.HTML
+def build(d):
+    TOY = nx.DiGraph()
+    for row in d["interactions"].itertuples(index=False):
+        TOY.add_node(row.author_id, kind="user", label=row.author_username)
+        TOY.add_node(row.comment_id, kind="comment", label=row.comment_id)
+        TOY.add_node(row.target_id, kind="player", label=row.entity_text)
+
+        TOY.add_edge(row.author_id, row.comment_id, kind="authored")
+        TOY.add_edge(row.comment_id, row.target_id, kind="targets", is_abusive=row.is_abusive)
+    return TOY

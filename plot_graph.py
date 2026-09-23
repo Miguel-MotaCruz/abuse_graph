@@ -19,10 +19,10 @@ from load_data import load
 # --- one colour and one shape per kind of node -----------------------------
 # Keep these consistent everywhere. A reader should learn the key once.
 STYLE = {
-    "user":    {"colour": "#2f6fdb", "shape": "o", "size": 700},
-    "comment": {"colour": "#c9ccd1a6", "shape": "s", "size": 50},
-    "player":  {"colour": "#e08b2a", "shape": "^", "size": 600},
-    "team":    {"colour": "#2e9e6b", "shape": "D", "size": 600},
+    "user":    {"colour": "#2f6fdb", "shape": "o", "size": 250},
+    "comment": {"colour": "#c9ccd1a6", "shape": "s", "size": 10},
+    "player":  {"colour": "#e08b2a", "shape": "^", "size": 200},
+    "team":    {"colour": "#2e9e6b", "shape": "D", "size": 200},
 }
 ABUSIVE_COLOUR = "#cc2b2b"     # red: is_abusive == "YES"
 PLAIN_COLOUR = "#c3c8cf"       # grey: everything else
@@ -59,9 +59,9 @@ def draw(G, path="my_graph.png", title="my graph"):
              if e.get("is_abusive") != "YES"]
 
     nx.draw_networkx_edges(G, pos, ax=ax, edgelist=plain,
-                           edge_color=PLAIN_COLOUR, width=1.2, arrows=False)
+                           edge_color=PLAIN_COLOUR, width=0.4, arrows=False)
     nx.draw_networkx_edges(G, pos, ax=ax, edgelist=abusive,
-                           edge_color=ABUSIVE_COLOUR, width=2.5, arrows=False)
+                           edge_color=ABUSIVE_COLOUR, width=0.4, arrows=False)
 
     # 3. NODES, one call per kind, so each kind gets its own colour and shape.
     for kind, style in STYLE.items():
@@ -160,3 +160,67 @@ draw(abusive_only, "my_graph_abusive_only.png", "toy dataset, abusive edges only
 #    plots above does step 2 of the tour replace?
 # step 2 replaces the plot with only the abusive edges drawn.
 #
+# NEW VERSION OF GRAPH FOR TOY.HTML
+def build(d):
+    TOY = nx.DiGraph()
+    for row in d["interactions"].itertuples(index=False):
+        TOY.add_node(row.author_id, kind="user", label=row.author_username)
+        TOY.add_node(row.comment_id, kind="comment", label=row.comment_id)
+        TOY.add_node(row.target_id, kind="player", label=row.entity_text)
+
+        TOY.add_edge(row.author_id, row.comment_id, kind="authored")
+        TOY.add_edge(row.comment_id, row.target_id, kind="targets", is_abusive=row.is_abusive)
+    return TOY
+
+def draw(TOY, path="my__toy_graph.png", title="whole toy dataset"):
+    pos = nx.kamada_kawai_layout(TOY.to_undirected())
+
+    fig, ax = plt.subplots(figsize=(14, 10))
+
+    abusive = [(a, b) for a, b, e in TOY.edges(data=True)
+                   if e.get("is_abusive") == "YES"]
+    plain = [(a, b) for a, b, e in TOY.edges(data=True)
+                 if e.get("is_abusive") != "YES"]
+    
+    nx.draw_networkx_edges(TOY, pos, ax=ax, edgelist=plain,
+                               edge_color=PLAIN_COLOUR, width=0.4, arrows=False)
+    nx.draw_networkx_edges(TOY, pos, ax=ax, edgelist=abusive,
+                               edge_color=ABUSIVE_COLOUR, width=0.8, arrows=False)
+    
+    for kind, style in STYLE.items():
+            nodes = [n for n, k in TOY.nodes(data="kind") if k == kind]
+            if not nodes:
+                continue
+            nx.draw_networkx_nodes(TOY, pos, ax=ax, nodelist=nodes,
+                                   node_color=style["colour"],
+                                   node_shape=style["shape"],
+                                   node_size=style["size"],
+                                   edgecolors="#33373d", linewidths=0.8)
+
+    labels = {}
+    for n, data in TOY.nodes(data=True):
+            if data.get("kind") in {"user", "player"}:
+                labels[n] = data.get("label")
+    nx.draw_networkx_labels(TOY, pos, ax=ax, labels=labels, font_size=5)
+    
+    handles = [Line2D([], [], color="w", marker=s["shape"], markersize=11,
+                          markerfacecolor=s["colour"], markeredgecolor="#33373d",
+                          label=k)
+                   for k, s in STYLE.items()
+                   if any(kk == k for _, kk in TOY.nodes(data="kind"))]
+    handles += [Line2D([], [], color=ABUSIVE_COLOUR, lw=0.8,
+                           label="targets edge, is_abusive=YES"),
+                    Line2D([], [], color=PLAIN_COLOUR, lw=0.4, label="other edge")]
+    ax.legend(handles=handles, loc="upper left", fontsize=9)
+    
+    ax.set_title(title)
+    ax.axis("off")
+    fig.tight_layout()
+    fig.savefig(path, dpi=150, facecolor="white")
+    plt.close(fig)
+    print("wrote", path)
+
+if __name__ == "__main__":
+    d = load("toy")
+    TOY = build(d)
+    draw(TOY, path="my_toy_graph.png", title="whole toy dataset",)
